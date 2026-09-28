@@ -1,7 +1,7 @@
 import { fromLevels } from "../domain/soreness";
 import React, { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { Aurora, Chroma, Float, Pop, Rise, Squish } from "../components/motion";
+import { Aurora, Float, Pop, Rise, Squish } from "../components/motion";
 import { Poster } from "../components/Poster";
 import { BodyMap } from "../components/BodyMap";
 import { PainCheck } from "../components/PainCheck";
@@ -30,6 +30,7 @@ import {
   focusTheme,
   fonts,
   s,
+  Display,
 } from "../components/ui";
 import { useStore } from "../state/store";
 import { Equipment, Level, Place, Profile, SoreLevels } from "../domain/types";
@@ -234,9 +235,9 @@ export function Onboarding() {
         <Deck />
         <View style={{ paddingHorizontal: 28, paddingTop: 8, gap: 14 }}>
           <Rise delay={200}>
-            <Chroma size={38} echoes={[C.violet, C.accent]}>
+            <Display size={38}>
               A fresh workout every day, built around how you feel.
-            </Chroma>
+            </Display>
           </Rise>
           <Rise delay={300}>
             <T style={{ fontSize: 16, lineHeight: 23, color: C.muted }}>

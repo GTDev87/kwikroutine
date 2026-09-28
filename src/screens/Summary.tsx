@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, ScrollView, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Button, C, Heading, Stat, T, Tape, focusTheme, fonts, s } from "../components/ui";
-import { Aurora, Chroma, Confetti, CountUp, Rise, useReducedMotion } from "../components/motion";
+import { Button, C, Heading, Stat, T, Tape, focusTheme, fonts, s, Display } from "../components/ui";
+import { Aurora, Confetti, CountUp, Rise, useReducedMotion } from "../components/motion";
 import { Poster } from "../components/Poster";
 import { useStore } from "../state/store";
 import { focusLabels } from "../domain/types";
@@ -43,9 +43,9 @@ export function Summary({ go }: { go: (route: string) => void }) {
             </Tape>
           </Rise>
           <Rise delay={80}>
-            <Chroma size={76} echoes={[C.violet, theme.tint]} style={{ textTransform: "uppercase" }}>
+            <Display size={76} style={{ textTransform: "uppercase" }}>
               {"Nice\nwork."}
-            </Chroma>
+            </Display>
           </Rise>
           <Rise delay={160}>
             <T style={[s.muted, { fontSize: 17, lineHeight: 24 }]}>

@@ -16,7 +16,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from "react-native-svg";
-import { C, fonts } from "./theme";
+import { C } from "./theme";
 
 // The native driver isn't available on web; fall back quietly there.
 export const ND = Platform.OS !== "web";
@@ -308,119 +308,6 @@ export function Stripes({
         <Path d={lines.join(" ")} stroke={color} strokeWidth={width} />
       </Svg>
     </View>
-  );
-}
-
-// Big type with offset color echoes behind it, like a misregistered poster print.
-// The echoes slide out from behind the letters when it mounts.
-export function Chroma({
-  children,
-  size,
-  color = C.ink,
-  echoes = [C.violet, C.accent],
-  offset,
-  style,
-  delay = 0,
-  numberOfLines,
-}: {
-  children: string;
-  size: number;
-  color?: string;
-  echoes?: string[];
-  offset?: number;
-  style?: StyleProp<TextStyle>;
-  delay?: number;
-  numberOfLines?: number;
-}) {
-  const d = offset ?? Math.max(2, Math.round(size / 16));
-  const v = useEntrance(delay + 140, 700);
-  const text: TextStyle = {
-    fontFamily: fonts.black,
-    fontSize: size,
-    lineHeight: Math.round(size * 1.02),
-    letterSpacing: -size * 0.035,
-    color,
-    includeFontPadding: false,
-  };
-  if (Platform.OS === "web")
-    return (
-      <WebChroma
-        v={v}
-        d={d}
-        echoes={echoes}
-        numberOfLines={numberOfLines}
-        style={[text, style, { color }]}
-      >
-        {children}
-      </WebChroma>
-    );
-  return (
-    <View>
-      {echoes.map((e, i) => {
-        const k = (i + 1) * d;
-        return (
-          <Animated.View
-            key={e + i}
-            {...hidden}
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              top: 0,
-              opacity: v.interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 0.9, 0.9] }),
-              transform: [
-                { translateX: v.interpolate({ inputRange: [0, 1], outputRange: [0, k] }) },
-                { translateY: v.interpolate({ inputRange: [0, 1], outputRange: [0, k] }) },
-              ],
-              zIndex: -1 - i,
-            }}
-          >
-            <Text numberOfLines={numberOfLines} style={[text, style, { color: e }]}>
-              {children}
-            </Text>
-          </Animated.View>
-        );
-      })}
-      <Text accessibilityRole="header" numberOfLines={numberOfLines} style={[text, style, { color }]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-// On web the echoes are a stacked CSS text-shadow, so the words exist once in the page
-// (duplicate text nodes confuse find-in-page and text queries).
-function WebChroma({
-  v,
-  d,
-  echoes,
-  numberOfLines,
-  style,
-  children,
-}: {
-  v: Animated.Value;
-  d: number;
-  echoes: string[];
-  numberOfLines?: number;
-  style: StyleProp<TextStyle>;
-  children: string;
-}) {
-  const [k, setK] = useState(0);
-  useEffect(() => {
-    const id = v.addListener(({ value }) => setK(value));
-    return () => v.removeListener(id);
-  }, [v]);
-  const textShadow = echoes
-    .map((e, i) => `${(i + 1) * d * k}px ${(i + 1) * d * k}px 0 ${e}`)
-    .join(", ");
-  return (
-    <Text
-      accessibilityRole="header"
-      numberOfLines={numberOfLines}
-      style={[style, { textShadow } as TextStyle]}
-    >
-      {children}
-    </Text>
   );
 }
 

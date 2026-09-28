@@ -32,8 +32,9 @@ import {
   fonts,
   s,
   sizes,
+  Display,
 } from "../components/ui";
-import { Chroma, Float, Glow, Pop, Rise, Squish, useLoop } from "../components/motion";
+import { Float, Glow, Pop, Rise, Squish, useLoop } from "../components/motion";
 import { Poster } from "../components/Poster";
 import { Ring } from "../components/Ring";
 import { useStore } from "../state/store";
@@ -302,7 +303,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
       <View style={{ flex: 1, padding: 24, justifyContent: "center", gap: 16 }}>
         <Rise style={{ gap: 14 }}>
           <Tape color={theme.tint}>{focusLabels[session.focus]}</Tape>
-          <Chroma size={44} echoes={[C.coral, C.violet]}>Call it a day?</Chroma>
+          <Display size={44}>Call it a day?</Display>
           <T style={[s.muted, { fontSize: 16, lineHeight: 23 }]}>
             We’ll save every set you completed. A shorter session still counts.
           </T>
@@ -326,7 +327,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
         <ScrollView contentContainerStyle={{ padding: 24, gap: 18 }}>
           <Breathe color={theme.tint} />
           <Rise delay={80}>
-            <Chroma size={40} echoes={[theme.tint, C.violet]}>Two minutes to warm up.</Chroma>
+            <Display size={40}>Two minutes to warm up.</Display>
           </Rise>
           <Rise delay={160}>
             <T style={[s.muted, { fontSize: 16 }]}>
@@ -550,7 +551,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
                 contentContainerStyle={{ gap: 10, paddingTop: 18 }}
                 style={{ flexShrink: 1 }}
               >
-                <Chroma size={30} echoes={[C.coral]}>Why skip this one?</Chroma>
+                <Display size={30}>Why skip this one?</Display>
                 <T style={[s.muted, { fontSize: 14, marginBottom: 8 }]}>
                   Your answer shapes what comes next.
                 </T>
@@ -904,13 +905,13 @@ export function Workout({ go }: { go: (route: string) => void }) {
           </Tape>
         </Rise>
         <Rise delay={180}>
-          <Chroma size={38} echoes={[stop ? C.coral : theme.tint, C.violet]}>
+          <Display size={38}>
             {stop
               ? "Good place to stop."
               : done
                 ? "Nice. Next one’s a surprise."
                 : "Your first move is a surprise."}
-          </Chroma>
+          </Display>
         </Rise>
         <T style={[s.muted, { fontSize: 16, lineHeight: 23 }]}>
           {empty

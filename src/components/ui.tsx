@@ -12,7 +12,7 @@ import {
 import Svg, { Path, Circle, Rect } from "react-native-svg";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, R, fonts, sizes } from "./theme";
-import { Chroma, Shine, Squish } from "./motion";
+import { Shine, Squish } from "./motion";
 export { C, R, fonts, sizes, focusTheme } from "./theme";
 export function T({ style, ...props }: TextProps) {
   return (
@@ -49,6 +49,40 @@ export function Heading({
     >
       {children}
     </T>
+  );
+}
+// Oversized headline for hero moments and screen titles.
+export function Display({
+  children,
+  size,
+  color = C.ink,
+  style,
+  numberOfLines,
+}: {
+  children: string;
+  size: number;
+  color?: string;
+  style?: TextProps["style"];
+  numberOfLines?: number;
+}) {
+  return (
+    <Text
+      accessibilityRole="header"
+      numberOfLines={numberOfLines}
+      style={[
+        {
+          fontFamily: fonts.black,
+          fontSize: size,
+          lineHeight: Math.round(size * 1.02),
+          letterSpacing: -size * 0.035,
+          color,
+          includeFontPadding: false,
+        },
+        style,
+      ]}
+    >
+      {children}
+    </Text>
   );
 }
 // Small uppercase mono caption used for eyebrows and section labels.
@@ -627,7 +661,7 @@ export function PageTitle({
   return (
     <View style={{ gap: 12 }}>
       {!!eyebrow && <Tape>{eyebrow}</Tape>}
-      <Chroma size={size} echoes={[C.violet]}>{title}</Chroma>
+      <Display size={size}>{title}</Display>
       {!!subtitle && (
         <T style={{ color: C.muted, fontSize: 16, lineHeight: 23 }}>{subtitle}</T>
       )}

@@ -11,8 +11,9 @@ import {
   T,
   Tape,
   s,
+  Display,
 } from "../components/ui";
-import { Aurora, Chroma, Rise } from "../components/motion";
+import { Aurora, Rise } from "../components/motion";
 import { useStore } from "../state/store";
 import { Level, equipmentLabels, titleCase, routineLabels } from "../domain/types";
 import { exerciseById } from "../data/exercises";
@@ -81,7 +82,7 @@ export function Profile({ go }: { go: (route: string) => void }) {
           <LogoMark size={64} />
         </View>
         <View style={{ gap: 6 }}>
-          <Chroma size={40} echoes={[C.violet, C.accent]}>Profile</Chroma>
+          <Display size={40}>Profile</Display>
           <Tape color={C.surface2} ink={C.muted}>
             {levelNames[profile.level]} · {styleNames[profile.routine]}
           </Tape>

@@ -16,8 +16,9 @@ import {
   sizes,
   R,
   focusTheme,
+  Display,
 } from "../components/ui";
-import { Aurora, Chroma, CountUp, Rise, Squish } from "../components/motion";
+import { Aurora, CountUp, Rise, Squish } from "../components/motion";
 import { BodyFigure } from "../components/BodyMap";
 import { useStore } from "../state/store";
 import { Muscle, Session, focusLabels } from "../domain/types";
@@ -223,7 +224,7 @@ export function History({ go }: { go: (route: string) => void }) {
     <Aurora colors={[C.violet, C.accent, C.coral]} intensity={0.2} height={360} />
     <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
       <Rise style={[s.between, { paddingHorizontal: 24, paddingTop: 14, alignItems: "flex-end" }]}>
-        <Chroma size={46} echoes={[C.violet, C.coral]}>History</Chroma>
+        <Display size={46}>History</Display>
         <View style={{ alignItems: "flex-end", paddingBottom: 6 }}>
           <T style={{ fontSize: 26, lineHeight: 28, fontFamily: fonts.black, color: week >= goal ? C.accent : C.ink }}>
             {week}<T style={{ fontSize: 16, color: C.muted, fontFamily: fonts.bold }}>/{goal}</T>

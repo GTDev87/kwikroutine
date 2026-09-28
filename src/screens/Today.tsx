@@ -17,8 +17,9 @@ import {
   focusTheme,
   fonts,
   s,
+  Display,
 } from "../components/ui";
-import { Aurora, Chroma, Float, LiveDot, ND, Rise, Squish } from "../components/motion";
+import { Aurora, Float, LiveDot, ND, Rise, Squish } from "../components/motion";
 import { Poster } from "../components/Poster";
 import { useStore } from "../state/store";
 import { access, eligible, newSession, weekCount } from "../domain/engine";
@@ -273,9 +274,9 @@ export function Today({ go }: { go: (route: string) => void }) {
         >
           <View style={{ gap: 10, flex: 1 }}>
             <Tape color={C.surface2} ink={C.muted}>{date}</Tape>
-            <Chroma size={46} echoes={[C.violet, theme.tint]}>
+            <Display size={46}>
               {`${greeting(now.getHours())}.`}
-            </Chroma>
+            </Display>
             <WeekStrip history={data.history} goal={data.profile?.weeklyGoal ?? 3} week={weekCount(data)} />
           </View>
           <Squish
@@ -294,9 +295,9 @@ export function Today({ go }: { go: (route: string) => void }) {
                 <LiveDot color={C.onAccent} size={7} />
                 <Tape color={C.onAccent} ink={theme.tint}>In progress</Tape>
               </View>
-              <Chroma size={48} color={onPoster} echoes={["rgba(255,255,255,0.55)"]} style={{ textTransform: "uppercase", marginTop: 14 }}>
+              <Display size={48} color={onPoster} style={{ textTransform: "uppercase", marginTop: 14 }}>
                 {focusLabels[data.session.focus]}
-              </Chroma>
+              </Display>
               <T style={{ color: soft, fontSize: 15, lineHeight: 21, marginTop: 10, fontFamily: fonts.medium, maxWidth: "85%" }}>
                 {data.session.completed.length} of your moves done at{" "}
                 {data.session.locationName}. Pick up where you left off.
@@ -317,9 +318,9 @@ export function Today({ go }: { go: (route: string) => void }) {
               <View style={[s.between, { alignItems: "flex-start" }]}>
                 <Tape color={C.violet} ink={C.onAccent}>Today’s plan</Tape>
               </View>
-              <Chroma size={56} color={C.ink} echoes={[C.violet, C.coral]} style={{ textTransform: "uppercase", marginTop: 40 }}>
+              <Display size={56} color={C.ink} style={{ textTransform: "uppercase", marginTop: 40 }}>
                 Rest day
-              </Chroma>
+              </Display>
               <T style={{ color: soft, fontSize: 15, lineHeight: 21, marginTop: 10, maxWidth: "88%" }}>{plan.why}</T>
               <View style={{ gap: 10, marginTop: 20 }}>
                 {"auto" in plan && plan.auto && (
@@ -338,9 +339,9 @@ export function Today({ go }: { go: (route: string) => void }) {
                   <Tape color={C.onAccent} ink={theme.tint}>Today’s focus</Tape>
                   {posterLink("Change", "Change today", () => go("today-style"))}
                 </View>
-                <Chroma size={50} color={onPoster} echoes={["rgba(255,255,255,0.6)"]} style={{ textTransform: "uppercase", marginTop: 18 }}>
+                <Display size={50} color={onPoster} style={{ textTransform: "uppercase", marginTop: 18 }}>
                   {focusLabels[plan.focus]}
-                </Chroma>
+                </Display>
                 <View style={[s.wrap, { marginTop: 14, gap: 6 }]}>
                   {tags.map((label) => (
                     <View
