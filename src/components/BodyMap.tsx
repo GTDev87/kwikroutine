@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
-import { MUSCLES, Muscle } from "../domain/types";
+import { MUSCLES, Muscle, SoreLevel, SoreLevels } from "../domain/types";
+import { soreLevelLabels } from "../domain/soreness";
 import { muscleName } from "../domain/today";
 import { bodyBack, bodyFront } from "./bodyPaths";
-import { C, Chip, T, fonts, s } from "./ui";
+import { C, R, T, TextLink, fonts, s } from "./ui";
 // Anatomy regions from the path set, mapped onto the muscles the exercise engine knows.
 // Hip flexors remain selectable in the muscle list; no inaccurate surface region.
 const SLUG: Record<string, Muscle> = {
@@ -31,21 +32,43 @@ const tap = (fn: () => void): object =>
   Platform.OS === "web"
     ? { onClick: fn, onPress: null, style: { cursor: "pointer" } }
     : { onPress: fn };
+export const soreColors = ["transparent", C.mild, C.moderate, C.severe] as const;
+const next = (level: number) => ((level + 1) % 4) as 0 | SoreLevel;
+function Dot({ level, size = 8 }: { level: number; size?: number }) {
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: level ? soreColors[level] : C.region,
+      }}
+    />
+  );
+}
+// Tap a muscle to step it through light → medium → very sore → not sore.
 export function BodyMap({
-  selected,
+  levels,
   onChange,
   height = 380,
 }: {
-  selected: Muscle[];
-  onChange: (m: Muscle[]) => void;
+  levels: SoreLevels;
+  onChange: (levels: SoreLevels) => void;
   height?: number;
 }) {
   const [side, setSide] = useState<"front" | "back">("front"),
     [list, setList] = useState(false);
-  const toggle = (m: Muscle) =>
-    onChange(
-      selected.includes(m) ? selected.filter((x) => x !== m) : [...selected, m],
-    );
+  const levelOf = (m: Muscle) => levels[m] ?? 0;
+  const cycle = (m: Muscle) => {
+    const updated = { ...levels };
+    const n = next(levelOf(m));
+    if (n) updated[m] = n;
+    else delete updated[m];
+    onChange(updated);
+  };
+  const describe = (m: Muscle) =>
+    `${muscleName(m)}, ${levelOf(m) ? soreLevelLabels[levelOf(m)].toLowerCase() : "not sore"}`;
+  const sore = MUSCLES.filter((m) => levelOf(m));
   const parts = side === "front" ? bodyFront : bodyBack;
   return (
     <View style={{ gap: 12, alignItems: "center" }}>
@@ -87,6 +110,14 @@ export function BodyMap({
           </Pressable>
         ))}
       </View>
+      <View style={[s.row, { gap: 14 }]} accessibilityLabel="Tap once for light, twice for medium, three times for very sore">
+        {([1, 2, 3] as const).map((l) => (
+          <View key={l} style={[s.row, { gap: 6 }]}>
+            <Dot level={l} size={10} />
+            <T style={[s.small, s.muted]}>{soreLevelLabels[l]}</T>
+          </View>
+        ))}
+      </View>
       <Svg
         width={height / 2}
         height={height}
@@ -95,8 +126,8 @@ export function BodyMap({
         {parts.map((p, i) => {
           const m = SLUG[p.s];
           const fill = m
-            ? selected.includes(m)
-              ? C.moderate
+            ? levelOf(m)
+              ? soreColors[levelOf(m)]
               : C.region
             : p.s === "hair"
               ? C.region
@@ -105,8 +136,8 @@ export function BodyMap({
           return m ? (
             <G
               key={`${side}-${i}`}
-              {...tap(() => toggle(m))}
-              accessibilityLabel={muscleName(m)}
+              {...tap(() => cycle(m))}
+              accessibilityLabel={describe(m)}
             >
               {paths}
             </G>
@@ -115,60 +146,65 @@ export function BodyMap({
           );
         })}
       </Svg>
+      <T style={[s.small, s.muted, { textAlign: "center" }]}>
+        {sore.length
+          ? "Tap again to change how sore it is."
+          : "Tap a muscle once for light, again for medium, again for very sore."}
+      </T>
       <View style={[s.wrap, { justifyContent: "center", minHeight: 36 }]}>
-        {selected.map((m) => (
-          <Pressable
-            key={m}
-            accessibilityRole="button"
-            accessibilityLabel={`${muscleName(m)} is sore. Tap to clear.`}
-            onPress={() => toggle(m)}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              paddingVertical: 7,
-              paddingHorizontal: 12,
-              borderRadius: 999,
-              backgroundColor: C.surface,
-              borderWidth: 1,
-              borderColor: C.line,
-            }}
-          >
-            <View
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: C.moderate,
-              }}
-            />
-            <T style={{ fontFamily: fonts.semibold, fontSize: 14 }}>
-              {muscleName(m)}
-            </T>
-            <T style={{ color: C.muted, fontSize: 14 }}>✕</T>
-          </Pressable>
+        {sore.map((m) => (
+          <LevelChip key={m} muscle={m} level={levelOf(m)} onPress={() => cycle(m)} label={`${describe(m)}. Tap to change.`} />
         ))}
       </View>
-      <Pressable accessibilityRole="button" onPress={() => setList(!list)}>
-        <T
-          style={{ color: C.accent, fontSize: 14, fontFamily: fonts.semibold }}
-        >
-          {list ? "Hide the list" : "Pick from a list instead"}
-        </T>
-      </Pressable>
+      <TextLink
+        title={list ? "Hide the list" : "Pick from a list instead"}
+        onPress={() => setList(!list)}
+      />
       {list && (
         <View style={[s.wrap, { justifyContent: "center" }]}>
           {MUSCLES.map((m) => (
-            <Chip
-              key={m}
-              small
-              label={muscleName(m)}
-              selected={selected.includes(m)}
-              onPress={() => toggle(m)}
-            />
+            <LevelChip key={m} muscle={m} level={levelOf(m)} onPress={() => cycle(m)} label={muscleName(m)} />
           ))}
         </View>
       )}
     </View>
+  );
+}
+function LevelChip({
+  muscle,
+  level,
+  onPress,
+  label,
+}: {
+  muscle: Muscle;
+  level: number;
+  onPress: () => void;
+  label: string;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityValue={{ text: soreLevelLabels[level] }}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        paddingVertical: 7,
+        paddingHorizontal: 12,
+        borderRadius: R.chip,
+        backgroundColor: C.surface,
+        borderWidth: 1.5,
+        borderColor: level ? soreColors[level] : C.line,
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
+      <Dot level={level} />
+      <T style={{ fontFamily: fonts.semibold, fontSize: 14 }}>{muscleName(muscle)}</T>
+      {!!level && (
+        <T style={{ color: C.muted, fontSize: 14 }}>{soreLevelLabels[level]}</T>
+      )}
+    </Pressable>
   );
 }

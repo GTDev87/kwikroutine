@@ -1,3 +1,4 @@
+import { describeSoreness } from './soreness';
 import { AppData, Equipment, Exercise, Performed, Session } from './types';
 import { TrainingMemory, trainingMemory } from './trainingMemory';
 import { fromKg, toKg, weightUnit } from './weightUnits';
@@ -60,7 +61,7 @@ export function loadOptions(data: AppData, session: Session, ex: Exercise, now =
     state: [
       `${ex.name}. ${data.profile?.level ?? 'beginner'}. Target ${ex.reps} reps per set. Load recorded in kg at this location: ${previous}.`,
       `Last two visits: ${comparable ? 'all planned sets completed, at least two extra reps each, all rated easy at the same weight' : 'not qualified for an increase'}.`,
-      `Today intent ${session.intent ?? 'auto'}, style ${session.style ?? 'balanced'}. Sore muscles: ${session.sore.join(', ') || 'none reported'}.`,
+      `Today intent ${session.intent ?? 'auto'}, style ${session.style ?? 'balanced'}. Sore muscles: ${describeSoreness(session) || 'none reported'}.`,
       `Workouts in 7 days: ${m.workouts7}; lifetime workouts ${m.workouts}; sets today ${m.currentSets}; hard sets today ${m.currentHardSets}.`,
       `Recent hard-set fraction ${m.recentHardRate === null ? 'unknown' : m.recentHardRate.toFixed(2)}. Completion fraction ${m.completionRate === null ? 'unknown' : m.completionRate.toFixed(2)}.`,
       `Same exercise lifetime visits ${m.exercises[ex.id]?.visits ?? 0}.`,

@@ -1,3 +1,4 @@
+import { resting, soreLevel, soreLoad } from './soreness';
 import { defaultSchedule, weekdayAt } from './routine';
 import { exerciseById } from "../data/exercises";
 import {
@@ -7,6 +8,7 @@ import {
   MUSCLES,
   Muscle,
   Session,
+  SoreLevels,
   focusTargets,
   titleCase,
 } from "./types";
@@ -36,7 +38,23 @@ const other: Record<"upper" | "lower", "upper" | "lower"> = {
 };
 // Full-body users train everything that isn’t sore. Split users alternate upper and
 // lower days, and swap when soreness rules out most of the planned half.
-export function todayFocus(data: AppData, sore: Muscle[], now = Date.now()) {
+export function todayFocus(
+  data: AppData,
+  reported: Muscle[],
+  now = Date.now(),
+  levels?: SoreLevels,
+) {
+  const plan = focusFor(data, resting({ sore: reported, soreLevels: levels }), now);
+  // Lightly sore muscles stay in the plan; say so, so the choice isn’t a surprise.
+  const light = reported.filter(
+    (m) => soreLevel({ sore: reported, soreLevels: levels }, m) === 1,
+  );
+  if (plan.rest || !light.length) return plan;
+  const note = `Your ${listNames(light)} ${light.length > 1 ? "are" : "is"} a little sore, so moves go easier on ${light.length > 1 ? "them" : "it"}.`;
+  return { ...plan, why: plan.why ? `${plan.why} ${note}` : note };
+}
+// `sore` here means muscles resting today (medium or very sore).
+function focusFor(data: AppData, sore: Muscle[], now: number) {
   const override = data.workoutOverride?.day === dayKey(now) ? data.workoutOverride.plan : null;
   const scheduled = data.profile?.routine === 'custom'
     ? (data.profile.schedule ?? defaultSchedule())[weekdayAt(now)] : null;
@@ -107,11 +125,19 @@ export function whyThis(
     if (last && now - (last.endedAt ?? last.startedAt) > 7 * DAY)
       parts.push("it’s been a while since you did it");
   }
-  // Eligibility already excludes every exercise that loads a sore muscle.
-  if (session.sore.length)
-    parts.push(
-      `it keeps load off your sore ${listNames(session.sore.slice(0, 2))}`,
-    );
+  // Only mention sore muscles this exercise genuinely leaves alone.
+  const spared = session.sore.filter(
+    (m) => !ex.primary.includes(m) && !ex.secondary.includes(m),
+  );
+  if (spared.length)
+    parts.push(`it keeps load off your sore ${listNames(spared.slice(0, 2))}`);
+  const loads = soreLoad(ex, session);
+  const light = loads.filter((s) => s.level === 1).map((s) => s.muscle);
+  const helper = loads.filter((s) => s.level === 2).map((s) => s.muscle);
+  if (helper.length)
+    parts.push(`it uses your sore ${listNames(helper.slice(0, 2))} only as a helper`);
+  if (light.length)
+    parts.push(`your ${listNames(light.slice(0, 2))} ${light.length > 1 ? "are" : "is"} only a little sore`);
   if (!parts.length)
     parts.push(
       `it balances today’s ${ex.primary.map((m) => muscleName(m).toLowerCase()).join(" and ")} work`,

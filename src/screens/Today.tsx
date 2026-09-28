@@ -1,3 +1,4 @@
+import { levelsOf, soreLevel, soreLevelLabels } from "../domain/soreness";
 import { DailyIntent } from "../components/DailyIntent";
 import React, { useState } from "react";
 import { Platform, Pressable, ScrollView, View } from "react-native";
@@ -65,7 +66,7 @@ export function Today({ go }: { go: (route: string) => void }) {
     [message, setMessage] = useState("");
   const membership = access(data),
     checkIn = todayCheckIn(data),
-    plan = todayFocus(data, checkIn.sore);
+    plan = todayFocus(data, checkIn.sore, Date.now(), checkIn.soreLevels);
   const now = new Date();
   const date = now.toLocaleDateString("en-US", {
     weekday: "long",
@@ -75,7 +76,7 @@ export function Today({ go }: { go: (route: string) => void }) {
   const start = () => {
     if (plan.rest) return;
     if (!membership.allowed) return go("paywall");
-    const session = newSession(data, minutes, plan.focus, plan.targets, checkIn.sore);
+    const session = newSession(data, minutes, plan.focus, plan.targets, checkIn.sore, Date.now(), levelsOf(checkIn));
     if (!eligible(data, session).length) {
       setMessage(
         "Nothing fits this combination today. Try more time, another place, or take a rest day.",
@@ -164,7 +165,9 @@ export function Today({ go }: { go: (route: string) => void }) {
                 <T style={{ color: C.muted, fontSize: 14 }}>Sore: </T>
                 <T style={{ fontFamily: fonts.semibold, fontSize: 14 }}>
                   {checkIn.sore.length
-                    ? checkIn.sore.map(muscleName).join(", ")
+                    ? checkIn.sore
+                        .map((m) => `${muscleName(m)} (${soreLevelLabels[soreLevel(checkIn, m)].toLowerCase()})`)
+                        .join(", ")
                     : "Nothing"}
                 </T>
               </T>

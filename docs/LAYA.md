@@ -2,7 +2,19 @@
 
 The app uses the English `convaiinnovations/laya` checkpoint at revision `55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851` (Apache-2.0). There is no inference server.
 
-## Prepare a fresh workspace
+## Get the model on a fresh clone
+
+The two ONNX weight files (`encoder.onnx` 793 MB, `head.onnx` 53 MB) are too large for git. They are attached to a GitHub Release of this private repo, tagged `laya-<first 12 hex of the encoder SHA-256>` (currently `laya-cf7017408dba`). Everything else, including `manifest.json` with every file's SHA-256 and the small tokenizer/config files, is committed.
+
+```sh
+brew install gh && gh auth login   # or export GITHUB_TOKEN with read access to the repo
+npm run model:fetch                # downloads missing weights and verifies them against manifest.json
+npm run model:check
+```
+
+After re-converting the model (below), publish the new weights once with `npm run model:publish`. The tag follows the encoder hash, so each model version gets its own release.
+
+## Rebuild the model from upstream
 
 Allow several GB of temporary disk space plus the final model and native build artifacts.
 

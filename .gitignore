@@ -51,9 +51,9 @@ assets/models/rl_agent_config.json
 playwright-report/
 test-results/
 .env.local
-assets/models/*.layajson
 
-# Local installable test artifacts
-/artifacts/
+# Local installable test artifacts; keep their metadata (hashes, build notes)
+/artifacts/*
+!/artifacts/*.json
 
 .venv-eval/

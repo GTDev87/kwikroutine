@@ -119,7 +119,7 @@ test("soreness selection and exercise replacement adapt the next suggestion", as
   page,
 }) => {
   await onboard(page, ["Triceps"]);
-  await expect(page.getByText("Triceps", { exact: true })).toBeVisible();
+  await expect(page.getByText("Triceps (light)", { exact: true })).toBeVisible();
   await reveal(page);
   const before = (await state(page)).session.current.exerciseId;
   await page.getByRole("button", { name: "Skip", exact: true }).click();
@@ -443,4 +443,24 @@ test('a “?” day in a custom week lets Laya choose on the day', async ({ page
   await page.screenshot({ path: 'docs/screenshots/open-day.png' });
   await reveal(page);
   expect((await state(page)).session.focus).toBe('open');
+});
+test('soreness map steps through light, medium, very sore and back to none', async ({ page }) => {
+  await onboard(page);
+  await page.getByRole('button', { name: 'Update soreness', exact: true }).click();
+  await page.getByRole('button', { name: 'Pick from a list instead', exact: true }).click();
+  const quads = page.getByRole('button', { name: 'Quads', exact: true });
+  await quads.click();
+  await quads.click();
+  await page.getByRole('button', { name: 'Chest', exact: true }).click();
+  await page.screenshot({ path: 'docs/screenshots/soreness-levels.png' });
+  await page.getByRole('button', { name: 'Save check-in', exact: true }).click();
+  const checkIn = (await state(page)).checkIn;
+  expect(checkIn.soreLevels).toEqual({ quads: 2, chest: 1 });
+  await expect(page.getByText('Quads (medium), Chest (light)', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Update soreness', exact: true }).click();
+  await page.getByRole('button', { name: 'Pick from a list instead', exact: true }).click();
+  await page.getByRole('button', { name: 'Quads', exact: true }).click();
+  await page.getByRole('button', { name: 'Quads', exact: true }).click();
+  await page.getByRole('button', { name: 'Save check-in', exact: true }).click();
+  expect((await state(page)).checkIn.soreLevels).toEqual({ chest: 1 });
 });

@@ -52,6 +52,8 @@
     "verify": "npm run typecheck && npm test",
     "model:prepare": ".venv-model/bin/python scripts/prepare_model.py",
     "model:check": "node scripts/check-model.cjs",
+    "model:fetch": "node scripts/fetch-model.cjs",
+    "model:publish": "node scripts/fetch-model.cjs --publish",
     "eas-build-post-install": "node scripts/release-check.cjs",
     "lint": "expo lint",
     "postinstall": "node scripts/patch-native-deps.cjs"

@@ -72,7 +72,10 @@ describe("recovery and reasons", () => {
   it("explains a pick using facts the filters guarantee", () => {
     const d = setup();
     const session = newSession(d, 20, "full", [], ["quads"], now);
-    const why = whyThis(d, session, exerciseById["body-squat"], now);
+    const upper = Object.values(exerciseById).find(
+      (ex) => ![...ex.primary, ...ex.secondary].includes("quads"),
+    )!;
+    const why = whyThis(d, session, upper, now);
     expect(why).toMatch(/haven’t done it yet/);
     expect(why).toMatch(/sore quads/);
   });
@@ -141,5 +144,52 @@ describe('open “?” days', () => {
     expect(options.length).toBeGreaterThan(0);
     expect(options.some(ex => [...ex.primary, ...ex.secondary].includes('quads'))).toBe(false);
     expect(personalizationContext(saved, session, options.slice(0, 3), monday).state).toMatch(/Focus:open \(no preset focus/);
+  });
+});
+
+describe('soreness levels', () => {
+  const find = (pred: (ex: (typeof exerciseById)[string]) => boolean) => Object.values(exerciseById).find(pred)!;
+  it('light allows, medium only as a helper, very sore not at all', async () => {
+    const { blockedBySoreness, sorenessWeight } = await import('../src/domain/soreness');
+    const leadsQuads = find(ex => ex.primary.includes('quads'));
+    const assistsQuads = find(ex => !ex.primary.includes('quads') && ex.secondary.includes('quads'));
+    const at = (level: 1 | 2 | 3) => ({ sore: ['quads' as const], soreLevels: { quads: level } });
+    expect(blockedBySoreness(leadsQuads, at(1))).toBe(false);
+    expect(sorenessWeight(leadsQuads, at(1))).toBeLessThan(1);
+    expect(blockedBySoreness(leadsQuads, at(2))).toBe(true);
+    expect(blockedBySoreness(assistsQuads, at(2))).toBe(false);
+    expect(blockedBySoreness(assistsQuads, at(3))).toBe(true);
+    // Check-ins saved before levels existed keep excluding the muscle entirely.
+    expect(blockedBySoreness(assistsQuads, { sore: ['quads'] })).toBe(true);
+  });
+  it('keeps lightly sore muscles in today’s plan, rests medium ones, and persists levels', () => {
+    const d = setup();
+    const plan = todayFocus(d, ['quads', 'chest'], now, { quads: 1, chest: 2 });
+    expect(plan.targets).toContain('quads');
+    expect(plan.targets).not.toContain('chest');
+    expect(plan.why).toMatch(/quads is a little sore/);
+    d.checkIn = { day: dayKey(now), sore: ['quads', 'chest'], soreLevels: { quads: 1, chest: 2 }, pain: false };
+    expect(dataSchema.parse(JSON.parse(JSON.stringify(d))).checkIn!.soreLevels).toEqual({ quads: 1, chest: 2 });
+  });
+  it('tells Laya each level and which candidates load sore muscles', async () => {
+    const { personalizationContext } = await import('../src/domain/coachContext');
+    const { eligible } = await import('../src/domain/engine');
+    const d = setup();
+    const session = newSession(d, 30, 'full', [], ['quads'], now, { quads: 1 });
+    const options = eligible(d, session, now);
+    const loaded = options.filter(ex => ex.primary.includes('quads')).slice(0, 2);
+    expect(loaded.length).toBeGreaterThan(0);
+    const state = personalizationContext(d, session, loaded, now).state;
+    expect(state).toMatch(/Sore:quads\(light\)/);
+    expect(state).toMatch(/loads sore quads light \(primary\)/);
+  });
+  it('“Too sore for this” marks the exercise’s muscles very sore', async () => {
+    const { applyFeedback } = await import('../src/domain/engine');
+    const d = setup();
+    d.session = newSession(d, 30, 'full', [], ['quads'], now, { quads: 1 });
+    const ex = find(e => e.primary.includes('quads'));
+    d.session.current = { exerciseId: ex.id, sets: [], plannedSets: 2 };
+    const next = applyFeedback(d, 'sore', [], [], now);
+    expect(next.session!.soreLevels!.quads).toBe(3);
   });
 });

@@ -1,3 +1,4 @@
+import { escalate } from "../domain/soreness";
 import { displayWeight, toKg, weightUnit } from "../domain/weightUnits";
 import { ExercisePicture, picturesFor } from "../components/ExercisePicture";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -237,11 +238,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
       const today = todayCheckIn(nextData);
       nextData = {
         ...nextData,
-        checkIn: {
-          ...today,
-          day: dayKey(),
-          sore: [...new Set([...today.sore, ...ex.primary])],
-        },
+        checkIn: { ...today, day: dayKey(), ...escalate(today, ex.primary) },
       };
     }
     update(() => nextData);

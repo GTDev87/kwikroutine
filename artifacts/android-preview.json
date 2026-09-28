@@ -1,0 +1,26 @@
+{
+  "builtAt": "2026-09-27T20:30:02.926641+00:00",
+  "file": "kwikroutine-android-preview.apk",
+  "bytes": 899189934,
+  "sha256": "47dd311581891b5c44339cef607a88d7157f1938a505fec8403af02616ab1307",
+  "architecture": "arm64-v8a",
+  "configuration": "Release",
+  "signing": "Android development certificate (same as previous preview)",
+  "features": "468 exercises, full 65-item catalog for home and gym, 51 dedicated equipment pictures, unlimited named places, daily intent, contextual feedback, automatic session styles",
+  "modelHashesVerified": true,
+  "deviceInstallation": "Installed with adb install -r on Pixel 8; launch Status ok; verified Weight units options on device and selected Pounds; in-progress workout retained.",
+  "nativeRuntime": "Explicit Android ONNX package registration; guarded JSI initialization; opt-in local diagnostics enabled",
+  "previousBuildNativeInferenceVerification": {
+    "at": "2026-09-26 22:00:27 America/New_York",
+    "candidates": 6,
+    "tokens": 224,
+    "firstLoadSeconds": 16.473,
+    "encoderAndHeadSeconds": 3.587
+  },
+  "exerciseImages": "468 of 468 exercises have bundled exercise-specific images; 19 new detailed original AI illustrations plus matching licensed banded bridge images; no generic figure fallback",
+  "originalImagePixelHashesVerified": true,
+  "trainingMemory": "All-history deterministic feature extraction, complete-fact tokenizer budgeting, recommendation tracking; no new questions",
+  "validation": "96 unit tests, 13 browser flows, TypeScript and lint passed",
+  "routineSettings": "Full body, splits, custom weekday focuses/muscles/rest; date-scoped daily override; existing sessions preserved",
+  "weightProgression": "Persisted lb/kg setting; pounds default; kg storage preserved; same-location prior load and guarded Laya increase decision; user-editable suggested load; fallback holds prior load"
+}

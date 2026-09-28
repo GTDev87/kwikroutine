@@ -3,17 +3,18 @@ import { ScrollView, View } from "react-native";
 import { BodyMap } from "../components/BodyMap";
 import { PainCheck } from "../components/PainCheck";
 import { Button, PageTitle, StepBar } from "../components/ui";
-import { Muscle } from "../domain/types";
+import { SoreLevels } from "../domain/types";
+import { fromLevels, levelsOf } from "../domain/soreness";
 import { dayKey, todayCheckIn } from "../domain/today";
 import { useStore } from "../state/store";
 // The daily check-in: the same soreness map as onboarding, saved for today only.
 export function CheckIn({ go }: { go: (route: string) => void }) {
   const { data, update } = useStore();
   const current = todayCheckIn(data);
-  const [sore, setSore] = useState<Muscle[]>(current.sore),
+  const [levels, setLevels] = useState<SoreLevels>(levelsOf(current)),
     [pain, setPain] = useState(current.pain);
   const save = () => {
-    update((d) => ({ ...d, checkIn: { ...todayCheckIn(d), day: dayKey(), sore, pain } }));
+    update((d) => ({ ...d, checkIn: { ...todayCheckIn(d), day: dayKey(), ...fromLevels(levels), pain } }));
     go("today");
   };
   return (
@@ -26,12 +27,12 @@ export function CheckIn({ go }: { go: (route: string) => void }) {
           title="Anything sore right now?"
           subtitle="Tap where you feel it. We’ll give those muscles a rest."
         />
-        <BodyMap selected={sore} onChange={setSore} />
+        <BodyMap levels={levels} onChange={setLevels} />
         <PainCheck value={pain} onChange={setPain} />
       </ScrollView>
       <View style={{ padding: 24, paddingTop: 12 }}>
         <Button
-          title={sore.length ? "Save check-in" : "Feeling fresh"}
+          title={Object.keys(levels).length ? "Save check-in" : "Feeling fresh"}
           onPress={save}
         />
       </View>

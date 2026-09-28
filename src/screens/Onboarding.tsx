@@ -1,3 +1,4 @@
+import { fromLevels } from "../domain/soreness";
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { HeroArt } from "../components/art";
@@ -32,7 +33,7 @@ import {
   sizes,
 } from "../components/ui";
 import { useStore } from "../state/store";
-import { Equipment, Level, Muscle, Place } from "../domain/types";
+import { Equipment, Level, Place, SoreLevels } from "../domain/types";
 import { dayKey } from "../domain/today";
 
 type Step = "welcome" | "level" | "style" | "where" | "home" | "gym" | "sore";
@@ -121,7 +122,7 @@ export function Onboarding() {
     [gym, setGym] = useState(false),
     [homeEq, setHomeEq] = useState<Equipment[]>(["mat", "dumbbells", "bands"]),
     [gymEq, setGymEq] = useState<Equipment[]>(GYM_EQUIPMENT),
-    [sore, setSore] = useState<Muscle[]>([]),
+    [soreLevels, setSoreLevels] = useState<SoreLevels>({}),
     [pain, setPain] = useState(false);
   const flow: Step[] = [
     "welcome",
@@ -158,7 +159,7 @@ export function Onboarding() {
       profile: { level, routine, weeklyGoal: d.profile?.weeklyGoal ?? 3 },
       locations: locations.length ? locations : d.locations,
       selectedLocationId: locations[0]?.id ?? d.selectedLocationId,
-      checkIn: withCheckIn ? { day: dayKey(), sore, pain } : null,
+      checkIn: withCheckIn ? { day: dayKey(), ...fromLevels(soreLevels), pain } : null,
       trialStartedAt: d.trialStartedAt ?? Date.now(),
       lastSeenAt: Math.max(d.lastSeenAt, Date.now()),
     }));
@@ -421,7 +422,7 @@ export function Onboarding() {
               title="Anything sore right now?"
               body="Tap where you feel it. We’ll give those muscles a rest."
             />
-            <BodyMap selected={sore} onChange={setSore} />
+            <BodyMap levels={soreLevels} onChange={setSoreLevels} />
             <PainCheck value={pain} onChange={setPain} />
           </>
         )}
