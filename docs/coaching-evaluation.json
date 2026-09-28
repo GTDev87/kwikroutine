@@ -1,0 +1,110 @@
+{
+  "scope": "Synthetic model and final-weight behavior, not fitness safety or coaching validation",
+  "cases": [
+    {
+      "name": "new_user",
+      "tokens": 499,
+      "seconds": 2.438,
+      "probabilities": {
+        "body-squat": 0.17669688165187836,
+        "wall-pushup": 0.21098129451274872,
+        "standing-hinge": 0.20319394767284393,
+        "prone-w": 0.14869090914726257,
+        "dead-bug": 0.13678117096424103,
+        "calf-raise": 0.12365581840276718
+      },
+      "finalSamplingWeights": {
+        "body-squat": 0.17194571924311763,
+        "wall-pushup": 0.1899901467249868,
+        "standing-hinge": 0.18589154320218293,
+        "prone-w": 0.15720574183453243,
+        "dead-bug": 0.1509374665410117,
+        "calf-raise": 0.1440293824541685
+      }
+    },
+    {
+      "name": "legs_already_worked",
+      "tokens": 507,
+      "seconds": 3.254,
+      "probabilities": {
+        "body-squat": 0.7070950269699097,
+        "wall-pushup": 0.08153292536735535,
+        "standing-hinge": 0.0631551593542099,
+        "prone-w": 0.056687407195568085,
+        "dead-bug": 0.05596880987286568,
+        "calf-raise": 0.035560641437768936
+      },
+      "finalSamplingWeights": {
+        "body-squat": 0.21185214132322616,
+        "wall-pushup": 0.22891626766986914,
+        "standing-hinge": 0.1053730987608463,
+        "prone-w": 0.20435154786939486,
+        "dead-bug": 0.20364106070687396,
+        "calf-raise": 0.04586588366978958
+      }
+    },
+    {
+      "name": "upper_already_worked",
+      "tokens": 505,
+      "seconds": 2.721,
+      "probabilities": {
+        "body-squat": 0.17918811738491058,
+        "wall-pushup": 0.45137396454811096,
+        "standing-hinge": 0.10786595195531845,
+        "prone-w": 0.128517284989357,
+        "dead-bug": 0.0795324519276619,
+        "calf-raise": 0.053522154688835144
+      },
+      "finalSamplingWeights": {
+        "body-squat": 0.2654568327853892,
+        "wall-pushup": 0.12123678334346165,
+        "standing-hinge": 0.20794275580857452,
+        "prone-w": 0.05614899201291375,
+        "dead-bug": 0.18509464877874204,
+        "calf-raise": 0.16411998727091887
+      }
+    },
+    {
+      "name": "repeated_local_squat_rejections",
+      "tokens": 503,
+      "seconds": 2.273,
+      "probabilities": {
+        "body-squat": 0.19567187130451202,
+        "wall-pushup": 0.21731996536254883,
+        "standing-hinge": 0.19382904469966888,
+        "prone-w": 0.14724992215633392,
+        "dead-bug": 0.13302917778491974,
+        "calf-raise": 0.1129000186920166
+      },
+      "finalSamplingWeights": {
+        "body-squat": 0.091807197659905,
+        "wall-pushup": 0.21462479173760612,
+        "standing-hinge": 0.20089905519517276,
+        "prone-w": 0.17368290781506607,
+        "dead-bug": 0.1653737546488003,
+        "calf-raise": 0.15361229294344972
+      }
+    },
+    {
+      "name": "declining_squat_reps",
+      "tokens": 502,
+      "seconds": 2.268,
+      "probabilities": {
+        "body-squat": 0.18614378571510315,
+        "wall-pushup": 0.21645928919315338,
+        "standing-hinge": 0.18968187272548676,
+        "prone-w": 0.14919084310531616,
+        "dead-bug": 0.1405000239610672,
+        "calf-raise": 0.11802423745393753
+      },
+      "finalSamplingWeights": {
+        "body-squat": 0.020498086595699384,
+        "wall-pushup": 0.2416393699353292,
+        "standing-hinge": 0.17229431290463876,
+        "prone-w": 0.19728326249335681,
+        "dead-bug": 0.19155263864533098,
+        "calf-raise": 0.17673232942564504
+      }
+    }
+  ]
+}

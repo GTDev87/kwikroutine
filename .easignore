@@ -1,0 +1,62 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+/ios
+/android
+
+# Local model tooling and generated builds
+.venv-model/
+.model-build/
+assets/models/*.onnx
+assets/models/*.data
+assets/models/tokenizer.json
+assets/models/rl_agent_config.json
+.firecrawl/
+playwright-report/
+test-results/
+.env.local
+assets/models/*.layajson
+
+# The model is embedded at native build time, including on EAS.
+!assets/models/*.onnx
+!assets/models/*.layajson
+!assets/models/manifest.json
+
+# Local installable test artifacts
+/artifacts/

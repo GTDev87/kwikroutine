@@ -1,0 +1,30 @@
+{
+  "model": "convaiinnovations/laya",
+  "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+  "license": "Apache-2.0",
+  "files": {
+    "tokenizer.layajson": {
+      "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+      "bytes": 3583228
+    },
+    "encoder.onnx": {
+      "sha256": "cf7017408dba11f9c948b7c99830bfa5950f234ad03ba43d67519918b8a2d374",
+      "bytes": 792847783
+    },
+    "config.layajson": {
+      "sha256": "ae287b56bbcf5f8c4f4541ae9dfd00c914c4c48b940b8398c3058af37ba92bbd",
+      "bytes": 745
+    },
+    "head.onnx": {
+      "sha256": "adeb39a1e5a792cc8bfcc72c116a4f624af91daaa9d246fa133bf5d2cf23b731",
+      "bytes": 53240960
+    }
+  },
+  "textParity": {
+    "cases": 4,
+    "maxProbabilityDrift": 0.004886448383331299,
+    "topChoiceMatches": 4,
+    "note": "CPU model fidelity only; not clinical or mobile performance validation."
+  },
+  "representation": "FP16 encoder and head; FP32 tensor interface"
+}

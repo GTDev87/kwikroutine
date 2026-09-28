@@ -1,0 +1,141 @@
+{
+  "createdAt": "2026-09-26",
+  "source": "Original AI-generated exercise-specific illustrations created with OpenAI image generation",
+  "referenceImages": [],
+  "format": "Unmodified PNG tool outputs",
+  "assets": [
+    {
+      "exerciseId": "seated-band-row",
+      "file": "seated-band-row.png",
+      "prompt": "Detailed realistic seated band row: band around both shoe soles, seated tall pulling ends to ribs, blue shirt dark shorts on mat.",
+      "sha256": "43b6dfd2af527eb30a4980e6da03743c1325c89b7d63224369b38b9d2d92fa3c",
+      "bytes": 1818814
+    },
+    {
+      "exerciseId": "supported-lunge",
+      "file": "supported-lunge.png",
+      "prompt": "Supported split squat: adult standing in a split stance with both feet on the floor, rear heel lifted. One hand lightly holds the back of a sturdy chair braced against a wall. Both knees bent in a shallow split squat, front knee tracking foot, torso upright. Side three-quarter view. No raised rear foot, no weights.",
+      "sha256": "93d5e9243228429fba80462ebd80e362b3a3ac8061b79ba0cf8c90ba4a11eff3",
+      "bytes": 1765716
+    },
+    {
+      "exerciseId": "goblet-squat",
+      "file": "goblet-squat.png",
+      "prompt": "Dumbbell goblet squat: adult at bottom of comfortable squat, both feet firmly grounded shoulder-width apart, knees tracking toes, chest tall. Hold ONE dumbbell vertically at chest with both hands supporting the upper bell. Clear full body three-quarter view. Not a kettlebell or barbell.",
+      "sha256": "54d4567b36a6955410865fd2202902debe2233f26057e0521384966bbc9f79e4",
+      "bytes": 1702868
+    },
+    {
+      "exerciseId": "prone-w",
+      "file": "prone-w.png",
+      "prompt": "Prone W raise: adult lying face DOWN on stomach on a mat. Forehead resting on a small folded towel, neck neutral. Arms bent like a W with elbows out at shoulder level and hands toward head. Both hands AND elbows lifted just slightly off mat, gently squeezing shoulder blades. Chest/pelvis and legs supported. View from diagonally above to make W-shaped arm position unambiguous.",
+      "sha256": "a8ac4fd9fb0734faa0d66fe3d689d8288bed0483e099c43284468e2b38f23c57",
+      "bytes": 1967065
+    },
+    {
+      "exerciseId": "reverse-snow",
+      "file": "reverse-snow.png",
+      "prompt": "Reverse snow angel exercise: adult lies face DOWN on stomach on a mat, forehead resting on folded towel, legs extended and supported, chest down. Show mid-sweep position with both arms STRAIGHT out diagonally to sides just below shoulder height, palms toward floor, hands hovering a little above mat. High diagonal overhead view. No weights, no snow, no extra limbs; do not show supine person.",
+      "sha256": "7f2a0cc35d5f64689618e8472a0ed48dedaffa177e9d60fef123c3bfce2d133b",
+      "bytes": 1868181
+    },
+    {
+      "exerciseId": "sumo-squat",
+      "file": "sumo-squat.png",
+      "prompt": "Use case: scientific-educational. Create one square detailed realistic digitally rendered fitness instruction image for Kwikroutine. Wide-stance BODYWEIGHT squat, no equipment or weights. Front three-quarter view, feet wider than shoulders, toes angled slightly out, knees bent and tracking toes, hips lowered between feet, heels grounded, torso upright. Hands clasped in front of chest. Adult in blue athletic shirt and dark shorts, anatomically natural, neutral light background, subtle shading. Entire body and equipment visible. ONE person, ONE pose, no collage, no text, no arrows, no watermark, no logos, no stick figures. Precisely show this exercise and equipment. Original AI-generated illustration.",
+      "sha256": "7717641acacac053ea7055d261bc8fc36d4467da4a2b246e966b48d7382876b0",
+      "bytes": 1696972
+    },
+    {
+      "exerciseId": "band-hinge",
+      "file": "band-hinge.png",
+      "prompt": "Use case: scientific-educational. Create one square detailed realistic digitally rendered fitness instruction image for Kwikroutine. Band good morning. Side view. Standing adult with long resistance band anchored under BOTH feet, holding its two ends at shoulders in hands, not around neck. Soft knees, hips pushed back, straight neutral back and torso hinged forward about 45 degrees. Band stretches visibly from feet to hands at shoulders. No barbell. Adult in blue athletic shirt and dark shorts, anatomically natural, neutral light background, subtle shading. Entire body and equipment visible. ONE person, ONE pose, no collage, no text, no arrows, no watermark, no logos, no stick figures. Precisely show this exercise and equipment. Original AI-generated illustration.",
+      "sha256": "a1d02a979d94dc72acb789ac076e44443dbcf7280b928540e1f08040436decbf",
+      "bytes": 1684598
+    },
+    {
+      "exerciseId": "machine-row",
+      "file": "machine-row.png",
+      "prompt": "Use case: scientific-educational. Create one square detailed realistic digitally rendered fitness instruction image for Kwikroutine. Seated chest-supported strength machine row. Adult seated upright on padded gym strength machine facing a chest pad, chest supported, feet on supports, holding two handles pulled toward lower ribs, elbows behind torso. Clearly recognizable selectorized strength row machine with seat, chest pad, levers and weight stack. NOT a rowing ergometer. Three-quarter side view. Adult in blue athletic shirt and dark shorts, anatomically natural, neutral light background, subtle shading. Entire body and equipment visible. ONE person, ONE pose, no collage, no text, no arrows, no watermark, no logos, no stick figures. Precisely show this exercise and equipment. Original AI-generated illustration.",
+      "sha256": "7d670713bfe9102c11bdddd80538b205139f619447ea43015468dac729ea3b45",
+      "bytes": 1937558
+    },
+    {
+      "exerciseId": "heel-slide",
+      "file": "heel-slide.png",
+      "prompt": "Use case: scientific-educational. Create one square detailed realistic digitally rendered fitness instruction image for Kwikroutine. Supine heel slide exercise, high three-quarter side view. Adult lying on back on a mat, head resting down, arms relaxed by sides. One knee bent foot flat near buttock, OTHER leg sliding heel away along mat almost straight with heel maintaining contact. Both feet and whole body visible. Adult in blue athletic shirt and dark shorts, anatomically natural, neutral light background, subtle shading. Entire body and equipment visible. ONE person, ONE pose, no collage, no text, no arrows, no watermark, no logos, no stick figures. Precisely show this exercise and equipment. Original AI-generated illustration.",
+      "sha256": "01e772c9d7f393fe0ddf6a36cb5cd99d6288a548ad5b9af640d584c9b327287b",
+      "bytes": 1652744
+    },
+    {
+      "exerciseId": "knee-plank",
+      "file": "knee-plank.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Kneeling FOREARM plank, side view. Adult supported on both forearms and BOTH knees on mat, elbows directly under shoulders. Body forms straight diagonal line head shoulders hips KNEES, hips lowered aligned not piked. Lower legs relaxed on mat behind knees. This is a modified plank from knees, not toes. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "495c6c671ad2e431df58ebd89f7f509b3fb13194e80a5b2bcd8160567e513038",
+      "bytes": 1560331
+    },
+    {
+      "exerciseId": "side-knee-plank",
+      "file": "side-knee-plank.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Modified kneeling SIDE plank, side three-quarter view. Adult supported on LEFT forearm with elbow below shoulder and left knee on mat, BOTH knees bent 90 degrees and stacked, lower legs behind. Hips raised so shoulder hip knee form straight line, right hand on hip. Full body visible, no straight-legged plank. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "de005a880f7069e5d2440f5eb4e020e3e3a83ff9102a69a6f16e95e3372d4562",
+      "bytes": 1750169
+    },
+    {
+      "exerciseId": "standing-march",
+      "file": "standing-march.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Standing core march. Adult upright with ONE knee lifted forward to hip height, other foot firmly planted, torso tall no leaning backward, arms bent naturally for balance. Full body three-quarter view. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "414961a794f225441cd3569e79e166130ad215f7df419e9bfa9e0b4f5cf61c91",
+      "bytes": 1556665
+    },
+    {
+      "exerciseId": "band-curl",
+      "file": "band-curl.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Standing resistance band BICEPS curl. Band center anchored under both feet, ends held in both hands palms UP at lower chest, elbows stay against sides, upper arms vertical, elbows bent, band stretches from soles to hands. Both feet flat, no leg curl, no dumbbells. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "14fa5394bb58be28649bb843ec81279c48491c2ff0e64dbff92322d201e7f062",
+      "bytes": 1468404
+    },
+    {
+      "exerciseId": "wall-slide",
+      "file": "wall-slide.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Wall slide shoulder mobility. Adult standing with BACK toward wall, feet slightly forward, ribs down, arms raised in goalpost position elbows bent about 90 degrees, backs of arms near wall, hands above head mid-slide. Front three-quarter view shows wall behind body and arm position. No facing wall push-up. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body and equipment visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "b89bdbdbc3dc7f5e98bff0dc7d6a9f9019a4c47e26eb27b62c6327c588aaca05",
+      "bytes": 1877706
+    },
+    {
+      "exerciseId": "seated-calf",
+      "file": "seated-calf.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Seated bodyweight calf raise on a sturdy plain chair. Side three-quarter view, adult seated upright, knees bent 90 degrees, hands resting on thighs, BOTH heels raised several centimeters, balls of both feet still planted on floor. No weights, no gym machine. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body and equipment visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "261d485b4725607793f4215bde2e0c31e7f32e166d3c39e8a6988cbdc2124858",
+      "bytes": 1723613
+    },
+    {
+      "exerciseId": "standing-abduction",
+      "file": "standing-abduction.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Standing side leg lift, front view. Adult standing upright beside wall, one hand lightly touching wall for balance, supporting leg straight foot planted, other leg lifted sideways modestly about 25 degrees, foot/toes facing FORWARD, torso upright. No bands, no weights. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body and equipment visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "930febb991985cb1893962955ba8be3ad918aa84ddf904283437f7f2640c6639",
+      "bytes": 1624414
+    },
+    {
+      "exerciseId": "band-side-step",
+      "file": "band-side-step.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Band lateral step. Front three-quarter view, adult in shallow squat, torso tall slight natural forward lean, wide stance midway sideways step. Visible short resistance LOOP BAND around BOTH thighs immediately ABOVE knees, stretched between thighs. Feet both forward, knees track toes. No band at ankles. Hands clasped at chest. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body and equipment visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "d5a0e0aeab481f8a473cbd9fdef9c2b3ac9de52c9e6383ec8c5446ff8e6cd18d",
+      "bytes": 1625510
+    },
+    {
+      "exerciseId": "standing-leg-curl",
+      "file": "standing-leg-curl.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Standing bodyweight HAMSTRING curl, side view. Adult stands beside wall with one hand lightly resting on wall. One leg straight with foot planted. OTHER knee bent 90 degrees, heel lifted BEHIND toward buttock. BOTH thighs remain parallel vertical side by side; raised knee does NOT come forward. Upright torso. No resistance band, no machine. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body and equipment visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "d1a19be64b737df9febd67c95a816307b9f0403bae91eed9ab13109db0908944",
+      "bytes": 1684347
+    },
+    {
+      "exerciseId": "seated-knee-extension",
+      "file": "seated-knee-extension.png",
+      "prompt": "Use case: scientific-educational. One square detailed realistic digitally rendered fitness illustration. Seated bodyweight knee extension. Adult sits upright on sturdy plain chair, hands resting on sides of seat, one foot flat on floor with knee bent, OTHER leg extended straight FORWARD from knee at almost horizontal with ankle flexed. Thigh remains supported by seat. Side three-quarter view. No weights, no bands, no gym machine. Adult in blue athletic shirt and dark shorts, natural anatomy, light neutral background, subtle shading. Entire body and equipment visible. ONE person in ONE pose, no text, no arrows, no collage, no logos, no stick figures. Precise exercise-specific pose.",
+      "sha256": "f5844776f09866a0c63935001311a660cb7e84e3c7f5bb270e59ffe0d6f9a41f",
+      "bytes": 1763425
+    }
+  ]
+}

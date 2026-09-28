@@ -1,0 +1,315 @@
+{
+  "source": "https://github.com/RepDB/exercise-dataset",
+  "revision": "9ed9357f09c7566ea0256c57ebd6374ebb8b575e",
+  "license": "RepDB Free Tier v1.0",
+  "attribution": "Exercise data by RepDB (repdb.co)",
+  "transformation": "Free equipment WebP converted to lossless transparent PNG; no generative processing.",
+  "assets": [
+    {
+      "equipment": "dumbbells",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/dumbbell.webp",
+      "file": "assets/equipment/dumbbell.png",
+      "sha256": "d7987399cccb1000ddbf4e63711242fe7209755293c6f1dc351acfe728032e0e"
+    },
+    {
+      "equipment": "bands",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/resistance-band.webp",
+      "file": "assets/equipment/resistance-band.png",
+      "sha256": "6d91ef6c8f960fc74723c3b318c5ab3118e8066cdbc3d43964a798aff9df7e34"
+    },
+    {
+      "equipment": "bench",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/flat-bench.webp",
+      "file": "assets/equipment/flat-bench.png",
+      "sha256": "65306ad555bdaf0f27b8e8a8cd27c234838e6d642e5f336aa4cafda0193efd00"
+    },
+    {
+      "equipment": "barbell",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/barbell.webp",
+      "file": "assets/equipment/barbell.png",
+      "sha256": "ed2dac44c7b7bd4c040cd800829ef98ef15e4d9b349c6a348fe6b02a274dc220"
+    },
+    {
+      "equipment": "cable",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/cable.webp",
+      "file": "assets/equipment/cable.png",
+      "sha256": "e750d9f7c7ba6bdbbac3e435a0ee8cb48708be6bdebfdff045c108bb52cd1ea8"
+    },
+    {
+      "equipment": "pullup-bar",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/pull-up-bar.webp",
+      "file": "assets/equipment/pull-up-bar.png",
+      "sha256": "aeba6ca30e93812e46c8402cec49f9a8b791a6e61323d0e72f1ace9bbc21cbe3"
+    },
+    {
+      "equipment": "leg-press",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/leg-press.webp",
+      "file": "assets/equipment/leg-press.png",
+      "sha256": "beeffd92e9382204eb39f76022c8cb2f43003777be73fb5c25343bff5e5e14ae"
+    },
+    {
+      "equipment": "leg-curl",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/leg-curl.webp",
+      "file": "assets/equipment/leg-curl.png",
+      "sha256": "2001fbc9b48cae4881bc9a8ee6a8c5488ac42d29625e5a4d6d08463f3bceb31b"
+    },
+    {
+      "equipment": "leg-extension",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/leg-extension.webp",
+      "file": "assets/equipment/leg-extension.png",
+      "sha256": "86d316adbb38df2da8c134d4a94eac0d9872a51e984d4523499e2f83c56c5c9d"
+    },
+    {
+      "equipment": "chest-press",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/chest-press-machine.webp",
+      "file": "assets/equipment/chest-press-machine.png",
+      "sha256": "d8fc5b34ed45fbc2d7bf77ad6061882cd4ef2fc33050795d7d40fe3c9cd7e2d5"
+    },
+    {
+      "equipment": "kettlebells",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/kettlebell.webp",
+      "file": "assets/equipment/kettlebell.png",
+      "sha256": "b70e0534bab628586ec3fe1128404a8eda72971abaa7547daefb87d6ea21fbc1"
+    },
+    {
+      "equipment": "ez-bar",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/ez-bar.webp",
+      "file": "assets/equipment/ez-bar.png",
+      "sha256": "0f200ca508a6807cfb09d908960284c473d8ce7bfa7ae4e0bf0ab92e5943c6f2"
+    },
+    {
+      "equipment": "smith-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/smith-machine.webp",
+      "file": "assets/equipment/smith-machine.png",
+      "sha256": "da3d3806a5ce52820812fe5ae388d88396fae033d1f933f23934268692fe8efd"
+    },
+    {
+      "equipment": "loop-bands",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/loop-band.webp",
+      "file": "assets/equipment/loop-band.png",
+      "sha256": "a92995852fe2d8af91c331ed9c6ba865719f49342f02b82640944a472cfc50b1"
+    },
+    {
+      "equipment": "suspension",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/suspension-trainer.webp",
+      "file": "assets/equipment/suspension-trainer.png",
+      "sha256": "6a89cf048788479bba6adddfa899b0b0eadf8369608e413f4128b1545c807176"
+    },
+    {
+      "equipment": "stability-ball",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/stability-ball.webp",
+      "file": "assets/equipment/stability-ball.png",
+      "sha256": "2a9ad8fe6d318075e9e688f61b9febbd11fe297dd497468e3e5132e821d5f47a"
+    },
+    {
+      "equipment": "rings",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/rings.webp",
+      "file": "assets/equipment/rings.png",
+      "sha256": "6034ddea1a21058c9b181b6871963c56a122b9df5951ba584419f4c4a04a2b6e"
+    },
+    {
+      "equipment": "plates",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/plates.webp",
+      "file": "assets/equipment/plates.png",
+      "sha256": "a7f6f7345f03c8f7abd28918d3e51193102f16eedb92452eb1dc42d482e41e0f"
+    },
+    {
+      "equipment": "dip-station",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/dip-station.webp",
+      "file": "assets/equipment/dip-station.png",
+      "sha256": "84ad29aa3d0e4170a8544df88676a51911bdb8734dfaadd0d0cfc0ac25b4da1d"
+    },
+    {
+      "equipment": "lat-pulldown",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/lat-pulldown-machine.webp",
+      "file": "assets/equipment/lat-pulldown-machine.png",
+      "sha256": "2d5e0557fe86ccdd1b7346fef790d80dfe0566361e49067f63453ee4fa21b98f"
+    },
+    {
+      "equipment": "hack-squat",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/hack-squat.webp",
+      "file": "assets/equipment/hack-squat.png",
+      "sha256": "2fcea3426a349e524dfd70aef88ec4388ddebe63de582dcda0334ac568bda3d7"
+    },
+    {
+      "equipment": "standing-calf-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/standing-calf-raise-machine.webp",
+      "file": "assets/equipment/standing-calf-raise-machine.png",
+      "sha256": "f32b8c8e3de2ea30c4830d71b91673083ef3edab9b7d79228ffb687dd32b05fa"
+    },
+    {
+      "equipment": "shoulder-press",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/shoulder-press-machine.webp",
+      "file": "assets/equipment/shoulder-press-machine.png",
+      "sha256": "075818df22cf935c94d7060629d7860bf34877c592cd725e015d92d20b2e0d53"
+    },
+    {
+      "equipment": "lateral-raise-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/plate-loaded-lateral-raise-machine.webp",
+      "file": "assets/equipment/plate-loaded-lateral-raise-machine.png",
+      "sha256": "7368f6b55880561454969af2e7491583ba8545ca45eb4e29675f129e1b202117"
+    },
+    {
+      "equipment": "ab-wheel",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/ab-wheel.webp",
+      "file": "assets/equipment/ab-wheel.png",
+      "sha256": "3ffe5e776a2b2222d7ead125eda2778f0861616e96216220b594d9d7c8e46ddd"
+    },
+    {
+      "equipment": "assisted-pullup",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/assisted-pullup-machine.webp",
+      "file": "assets/equipment/assisted-pullup-machine.png",
+      "sha256": "f165c199bd3d0dbfaa1e9c2272f5e16d092f511447666820ab9db31697954fab"
+    },
+    {
+      "equipment": "trap-bar",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/trap-bar.webp",
+      "file": "assets/equipment/trap-bar.png",
+      "sha256": "89b47c3548d28a6ce64dcb9bd43552d7c244fbdaeafd3e0736349dd6c0050a56"
+    },
+    {
+      "equipment": "hip-abduction",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/hip-abduction-machine.webp",
+      "file": "assets/equipment/hip-abduction-machine.png",
+      "sha256": "8160b373bb60c4fc1bf381887184a2866d5bf20d206ed13bd0ea710fb897b3d1"
+    },
+    {
+      "equipment": "hip-adduction",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/hip-adduction-machine.webp",
+      "file": "assets/equipment/hip-adduction-machine.png",
+      "sha256": "7372508a72aba207aa9a68333f5e00a3d84b5e0c660b73c10d1385fdbc8394e2"
+    },
+    {
+      "equipment": "back-extension-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/back-extension-machine.webp",
+      "file": "assets/equipment/back-extension-machine.png",
+      "sha256": "d4d455f3cb03f1b2c349654a52b5cfc1457a4d83595072f27f8bfe76fc9361f9"
+    },
+    {
+      "equipment": "biceps-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/bicep-curl-machine.webp",
+      "file": "assets/equipment/bicep-curl-machine.png",
+      "sha256": "fe99953002a4087357802245bf385455ebedd38719a52e591551a0ab0ee2e798"
+    },
+    {
+      "equipment": "pec-deck",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/pec-deck.webp",
+      "file": "assets/equipment/pec-deck.png",
+      "sha256": "33a2524c1b68b2b1ba3d1c52f97815262cd4aabb06185c12ae5d0ec6684effc4"
+    },
+    {
+      "equipment": "preacher-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/preacher-curl-machine.webp",
+      "file": "assets/equipment/preacher-curl-machine.png",
+      "sha256": "c721ae9bcabae75927927f34eff1c40801340b783a03d107da90684bfcc4f2bf"
+    },
+    {
+      "equipment": "ab-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/ab-crunch-machine.webp",
+      "file": "assets/equipment/ab-crunch-machine.png",
+      "sha256": "6e27aa3d0b5db640b65055a119e924a809c60ff7af6aaa6db16d157bd91047a2"
+    },
+    {
+      "equipment": "triceps-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/tricep-extension-machine.webp",
+      "file": "assets/equipment/tricep-extension-machine.png",
+      "sha256": "ed0ea630740da48b541239aa5718cb673a7d15831414e63875353a0202c7267c"
+    },
+    {
+      "equipment": "donkey-calf-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/donkey-calf-raise-machine.webp",
+      "file": "assets/equipment/donkey-calf-raise-machine.png",
+      "sha256": "e9eb6a227ca3f809d170dd8da9de9aec51d12a42adac40dbabd6cd334a413e9d"
+    },
+    {
+      "equipment": "glute-drive",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/hip-thrust-machine.webp",
+      "file": "assets/equipment/hip-thrust-machine.png",
+      "sha256": "7d0ca88fded33993dbe279b14731adbb90119389ba43478baa54d82ee23da8ba"
+    },
+    {
+      "equipment": "shrug-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/shrug-machine.webp",
+      "file": "assets/equipment/shrug-machine.png",
+      "sha256": "1ed5b1d95958fb125b8e654ae456dc9405d3531bca7e1193b15f812a2b7e2c8a"
+    },
+    {
+      "equipment": "seated-calf-machine",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/seated-calf-raise-machine.webp",
+      "file": "assets/equipment/seated-calf-raise-machine.png",
+      "sha256": "9346c0ebe29e81ebaa7a62bb1d980a09cef5d08c4db5abba5268bc71b28b8ab7"
+    },
+    {
+      "equipment": "wrist-roller",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/wrist-roller.webp",
+      "file": "assets/equipment/wrist-roller.png",
+      "sha256": "935b69b995054ba2aa21bd85005939fe574d00435229c70155ebfda37401156c"
+    },
+    {
+      "equipment": "air-bike",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/air-bike.webp",
+      "file": "assets/equipment/air-bike.png",
+      "sha256": "313fd2422b38c6379dbaa9de045b648d5ed2ca996c68cc01e3da4a0f713e6728"
+    },
+    {
+      "equipment": "battle-ropes",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/battle-rope.webp",
+      "file": "assets/equipment/battle-rope.png",
+      "sha256": "23e9aefc01a237b35ca9cd1035db82f37ffff857c80dc5b20766b6908d900936"
+    },
+    {
+      "equipment": "plyo-box",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/plyo-box.webp",
+      "file": "assets/equipment/plyo-box.png",
+      "sha256": "98d0547b31336b9abfb8916df0fba8505fa20fd9d33e37ccaea721fc3d84dbe7"
+    },
+    {
+      "equipment": "treadmill",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/treadmill.webp",
+      "file": "assets/equipment/treadmill.png",
+      "sha256": "d2b9bd175d9493b014988a9dc668c1ff0eca08f0dd13d1b3a7814c2940ca5196"
+    },
+    {
+      "equipment": "elliptical",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/elliptical.webp",
+      "file": "assets/equipment/elliptical.png",
+      "sha256": "ba5b0b48912972df97dc92ad7c5a086a42ff3a2270a03525664b72b21ef81ae6"
+    },
+    {
+      "equipment": "jump-rope",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/jump-rope.webp",
+      "file": "assets/equipment/jump-rope.png",
+      "sha256": "b8ca49bacc064e45b8c9b73342e3cffac1393765098ba7d8ba3491adf9776eb9"
+    },
+    {
+      "equipment": "slam-ball",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/slam-ball.webp",
+      "file": "assets/equipment/slam-ball.png",
+      "sha256": "b35ce18526e1dddff08a749da30f9d14d36fbebd5b6386f1c570c93f94d349c8"
+    },
+    {
+      "equipment": "rower",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/rower.webp",
+      "file": "assets/equipment/rower.png",
+      "sha256": "e40ee24756b01a04df3946b2baea7cc75562ea57d86b810db4bfe47851099301"
+    },
+    {
+      "equipment": "sled",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/sled.webp",
+      "file": "assets/equipment/sled.png",
+      "sha256": "622c94247c4122811c5c55224f447703f040ee9b3180263fe9d30b018a7e17a5"
+    },
+    {
+      "equipment": "stair-climber",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/stair-climber.webp",
+      "file": "assets/equipment/stair-climber.png",
+      "sha256": "cacc39685dfec1a1ca9bf771ab1df85889827b2c8861864423b5da1c0c1212af"
+    },
+    {
+      "equipment": "stationary-bike",
+      "source": "https://raw.githubusercontent.com/RepDB/exercise-dataset/9ed9357f09c7566ea0256c57ebd6374ebb8b575e/images/equipment/stationary-bike.webp",
+      "file": "assets/equipment/stationary-bike.png",
+      "sha256": "a17af87f1bd8ffb86eb2a3282f6984dd93c348ebf7e5ea8dcfab08f03ce5898f"
+    }
+  ]
+}

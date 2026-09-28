@@ -39,3 +39,21 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Local model tooling and generated builds
+.venv-model/
+.model-build/
+assets/models/*.onnx
+assets/models/*.data
+assets/models/tokenizer.json
+assets/models/rl_agent_config.json
+.firecrawl/
+playwright-report/
+test-results/
+.env.local
+assets/models/*.layajson
+
+# Local installable test artifacts
+/artifacts/
+
+.venv-eval/

@@ -1,0 +1,110 @@
+[
+  {
+    "name": "db-curl-auto",
+    "tokens": 185,
+    "seconds": 1.501,
+    "probabilities": {
+      "hold": 0.7632530331611633,
+      "increase": 0.23674699664115906
+    }
+  },
+  {
+    "name": "db-curl-challenge",
+    "tokens": 185,
+    "seconds": 1.654,
+    "probabilities": {
+      "hold": 0.7543981671333313,
+      "increase": 0.2456018477678299
+    }
+  },
+  {
+    "name": "db-curl-familiar",
+    "tokens": 185,
+    "seconds": 1.975,
+    "probabilities": {
+      "hold": 0.7605342864990234,
+      "increase": 0.23946571350097656
+    }
+  },
+  {
+    "name": "leg-press-auto",
+    "tokens": 183,
+    "seconds": 1.472,
+    "probabilities": {
+      "hold": 0.7288501858711243,
+      "increase": 0.27114978432655334
+    }
+  },
+  {
+    "name": "leg-press-challenge",
+    "tokens": 183,
+    "seconds": 0.864,
+    "probabilities": {
+      "hold": 0.7250688076019287,
+      "increase": 0.2749312222003937
+    }
+  },
+  {
+    "name": "leg-press-familiar",
+    "tokens": 183,
+    "seconds": 0.849,
+    "probabilities": {
+      "hold": 0.7316836714744568,
+      "increase": 0.2683162987232208
+    }
+  },
+  {
+    "name": "db-row-auto",
+    "tokens": 188,
+    "seconds": 0.981,
+    "probabilities": {
+      "hold": 0.752332866191864,
+      "increase": 0.2476670891046524
+    }
+  },
+  {
+    "name": "db-row-challenge",
+    "tokens": 188,
+    "seconds": 0.778,
+    "probabilities": {
+      "hold": 0.7427555918693542,
+      "increase": 0.25724443793296814
+    }
+  },
+  {
+    "name": "db-row-familiar",
+    "tokens": 188,
+    "seconds": 0.742,
+    "probabilities": {
+      "hold": 0.7529146671295166,
+      "increase": 0.24708528816699982
+    }
+  },
+  {
+    "name": "goblet-squat-auto",
+    "tokens": 185,
+    "seconds": 0.755,
+    "probabilities": {
+      "hold": 0.7776687145233154,
+      "increase": 0.22233125567436218
+    }
+  },
+  {
+    "name": "goblet-squat-challenge",
+    "tokens": 185,
+    "seconds": 0.755,
+    "probabilities": {
+      "hold": 0.759464681148529,
+      "increase": 0.24053530395030975
+    }
+  },
+  {
+    "name": "goblet-squat-familiar",
+    "tokens": 185,
+    "seconds": 0.762,
+    "probabilities": {
+      "hold": 0.7743979096412659,
+      "increase": 0.2256021350622177
+    }
+  }
+]
