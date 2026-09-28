@@ -100,9 +100,11 @@ function WeekStrip({ history, goal, week }: { history: { startedAt: number; ende
           );
         })}
       </View>
-      <T style={{ fontSize: 13, color: C.muted, fontFamily: fonts.medium }}>
-        <T style={{ fontSize: 13, color: C.ink, fontFamily: fonts.bold }}>{week}</T> of {goal} this week
-      </T>
+      {/* Sibling texts, not nested: Android clips nested runs that mix font families. */}
+      <View style={{ flexDirection: "row", alignItems: "baseline", flexShrink: 1 }}>
+        <T style={{ fontSize: 13, color: C.ink, fontFamily: fonts.bold }}>{week}</T>
+        <T style={{ fontSize: 13, color: C.muted, fontFamily: fonts.medium }}>{` of ${goal} this week`}</T>
+      </View>
     </View>
   );
 }
