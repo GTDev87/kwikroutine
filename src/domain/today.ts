@@ -32,10 +32,18 @@ export function restBasis(data: AppData, now = Date.now()) {
 }
 const scheduledOpen = (data: AppData, now: number) =>
   data.workoutOverride?.day !== dayKey(now) && scheduledPlan(data, now)?.focus === 'open';
+// Rest is a start-of-day call. Once today's call is to train, or a workout has started or
+// finished today, the user is ready to exercise and a later check-in can't turn it into rest.
+const committedToTrain = (data: AppData, now: number) => {
+  const d = data.restDecision, today = dayKey(now);
+  return (d?.day === today && !d.rest) || !!data.session ||
+    data.history.some(s => dayKey(s.endedAt ?? s.startedAt) === today && s.completed.some(p => p.sets.length));
+};
 // A scheduled open day waits on the app's train-or-rest call. Changing today skips it.
 export function restPending(data: AppData, now = Date.now()) {
   const d = data.restDecision;
-  return scheduledOpen(data, now) && !(d && d.day === dayKey(now) && d.basis === restBasis(data, now));
+  return scheduledOpen(data, now) && !committedToTrain(data, now) &&
+    !(d && d.day === dayKey(now) && d.basis === restBasis(data, now));
 }
 export const muscleName = (m: Muscle) => (m === "core" ? "Core" : titleCase(m));
 export const listNames = (ms: Muscle[]) => {
@@ -72,7 +80,7 @@ function focusFor(data: AppData, sore: Muscle[], now: number) {
   const selected = override ?? scheduled;
   if (selected) {
     const decided = data.restDecision;
-    if (selected.focus === 'open' && scheduledOpen(data, now) && decided?.rest && decided.day === dayKey(now) && decided.basis === restBasis(data, now))
+    if (selected.focus === 'open' && scheduledOpen(data, now) && decided?.rest && decided.day === dayKey(now) && decided.basis === restBasis(data, now) && !committedToTrain(data, now))
       return { focus: 'open' as Focus, targets: [] as Muscle[], why: 'Kwik Pick suggests resting today after your recent training. You can still train if you feel up to it.', rest: true, auto: true };
     if (selected.focus === 'rest') return { focus: 'full' as Focus, targets: [] as Muscle[], why: 'A day to rest. You can change today if your plans change.', rest: true };
     const intended = selected.focus === 'custom' ? selected.muscles : focusTargets[selected.focus];

@@ -237,6 +237,26 @@ describe('open days the app turns into rest days', () => {
     expect(restPending(d, monday)).toBe(false);
     expect(todayFocus(d, [], monday).rest).toBe(false);
   });
+  it('decides rest at the start of the day and never stops someone ready to train', async () => {
+    const { restBasis, restPending } = await import('../src/domain/today');
+    // A train call holds even if soreness is updated later, e.g. at the gym.
+    const d = await openMonday();
+    d.restDecision = { day: dayKey(monday), basis: restBasis(d, monday), rest: false };
+    d.checkIn = { day: dayKey(monday), sore: ['quads'], soreLevels: { quads: 2 }, pain: false };
+    expect(restPending(d, monday)).toBe(false);
+    expect(todayFocus(d, ['quads'], monday, { quads: 2 }).rest).toBe(false);
+    // A workout in progress, or one already done today, is never overruled by a late rest call.
+    const busy = await openMonday();
+    busy.session = newSession(busy, 30, 'open', [], [], monday - 600000);
+    expect(restPending(busy, monday)).toBe(false);
+    busy.restDecision = { day: dayKey(monday), basis: restBasis(busy, monday), rest: true };
+    expect(todayFocus(busy, [], monday).rest).toBe(false);
+    const done = await openMonday();
+    trained(done, monday - 3600000);
+    expect(restPending(done, monday)).toBe(false);
+    done.restDecision = { day: dayKey(monday), basis: restBasis(done, monday), rest: true };
+    expect(todayFocus(done, [], monday).rest).toBe(false);
+  });
 });
 
 describe('Kwik Pick every day', () => {
