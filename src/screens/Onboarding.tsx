@@ -1,7 +1,8 @@
 import { fromLevels } from "../domain/soreness";
 import React, { useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
-import { HeroArt } from "../components/art";
+import { ScrollView, View } from "react-native";
+import { Aurora, Chroma, Float, Pop, Rise, Squish } from "../components/motion";
+import { Poster } from "../components/Poster";
 import { BodyMap } from "../components/BodyMap";
 import { PainCheck } from "../components/PainCheck";
 import {
@@ -17,24 +18,24 @@ import {
   Button,
   C,
   Check,
-  Heading,
   Icon,
   LevelBars,
   Logo,
   OptionCard,
   PageTitle,
-  Placeholder,
   R,
   StepBar,
   T,
   Toggle,
+  focusTheme,
   fonts,
   s,
-  sizes,
 } from "../components/ui";
 import { useStore } from "../state/store";
-import { Equipment, Level, Place, SoreLevels } from "../domain/types";
+import { Equipment, Level, Place, Profile, SoreLevels } from "../domain/types";
 import { dayKey } from "../domain/today";
+import { defaultSchedule, validSchedule } from "../domain/routine";
+import { WeekEditor } from "../components/WeekEditor";
 
 type Step = "welcome" | "level" | "style" | "where" | "home" | "gym" | "sore";
 const levels: [Level, string, string][] = [
@@ -102,6 +103,59 @@ function Week({ days }: { days: string[] }) {
     </View>
   );
 }
+// Three workout posters fanned out and bobbing, with a mystery card on top.
+function Deck() {
+  const cards = [
+    { theme: focusTheme.upper, label: "Upper\nbody", turn: -14, x: -92, y: 18, delay: 0 },
+    { theme: focusTheme.lower, label: "Legs &\ncore", turn: 13, x: 92, y: 24, delay: 90 },
+    { theme: focusTheme.full, label: "?", turn: -2, x: 0, y: 0, delay: 180 },
+  ];
+  return (
+    <View style={{ flex: 1, minHeight: 250, alignItems: "center", justifyContent: "center" }}>
+      {cards.map((c, i) => (
+        <View key={i} style={{ position: "absolute", transform: [{ translateX: c.x }, { translateY: c.y }] }}>
+        <Pop delay={c.delay}>
+          <Float distance={6 + i * 2} duration={2200 + i * 400} rotate={1.5}>
+            <Poster
+              theme={c.theme}
+              shine={i === 2}
+              watermark={i === 2}
+              style={{
+                width: 150,
+                height: 200,
+                padding: 16,
+                borderRadius: 24,
+                justifyContent: c.label === "?" ? "center" : "flex-end",
+                alignItems: c.label === "?" ? "center" : c.x > 0 ? "flex-end" : "flex-start",
+                transform: [{ rotate: `${c.turn}deg` }],
+              }}
+            >
+              <T
+                style={{
+                  fontFamily: fonts.black,
+                  fontSize: c.label === "?" ? 120 : 26,
+                  lineHeight: c.label === "?" ? 130 : 26,
+                  letterSpacing: c.label === "?" ? -4 : -1,
+                  textTransform: "uppercase",
+                  textAlign: c.x > 0 ? "right" : "left",
+                  color: C.onAccent,
+                }}
+              >
+                {c.label}
+              </T>
+              {c.label === "?" && (
+                <View style={{ position: "absolute", top: 14, left: 14 }}>
+                  <T style={{ fontFamily: fonts.mono, fontSize: 11, color: "rgba(13,13,14,0.7)", letterSpacing: 0.8 }}>TODAY</T>
+                </View>
+              )}
+            </Poster>
+          </Float>
+        </Pop>
+        </View>
+      ))}
+    </View>
+  );
+}
 function Intro({
   eyebrow,
   title,
@@ -117,7 +171,8 @@ export function Onboarding() {
   const { update } = useStore();
   const [step, setStep] = useState<Step>("welcome"),
     [level, setLevel] = useState<Level>("beginner"),
-    [routine, setRoutine] = useState<"full" | "split">("full"),
+    [routine, setRoutine] = useState<Profile["routine"]>("full"),
+    [schedule, setSchedule] = useState(defaultSchedule),
     [home, setHome] = useState(true),
     [gym, setGym] = useState(false),
     [homeEq, setHomeEq] = useState<Equipment[]>(["mat", "dumbbells", "bands"]),
@@ -156,7 +211,12 @@ export function Onboarding() {
     ];
     update((d) => ({
       ...d,
-      profile: { level, routine, weeklyGoal: d.profile?.weeklyGoal ?? 3 },
+      profile: {
+        level,
+        routine,
+        ...(routine === "custom" ? { schedule } : {}),
+        weeklyGoal: d.profile?.weeklyGoal ?? 3,
+      },
       locations: locations.length ? locations : d.locations,
       selectedLocationId: locations[0]?.id ?? d.selectedLocationId,
       checkIn: withCheckIn ? { day: dayKey(), ...fromLevels(soreLevels), pain } : null,
@@ -167,32 +227,26 @@ export function Onboarding() {
   if (step === "welcome")
     return (
       <View style={{ flex: 1 }}>
-        <View style={{ paddingHorizontal: 28, paddingTop: 12 }}>
+        <Aurora colors={[C.accent, C.violet, C.coral]} intensity={0.3} height={560} />
+        <Rise style={{ paddingHorizontal: 28, paddingTop: 12 }}>
           <Logo />
-        </View>
-        {/* Hero photo slot: someone training at home. */}
-        <Placeholder
-          radius={28}
-          style={{
-            flex: 1,
-            marginHorizontal: 20,
-            marginTop: 24,
-            justifyContent: "center",
-          }}
-        >
-          <HeroArt height={240} />
-        </Placeholder>
-        <View style={{ paddingHorizontal: 28, paddingTop: 28, gap: 12 }}>
-          <Heading size={sizes.display}>
-            A fresh workout every day, built around how you feel.
-          </Heading>
-          <T style={{ fontSize: 16, lineHeight: 23, color: C.muted }}>
-            Tell us what’s sore and how much time you have. We’ll pick the
-            moves.
-          </T>
+        </Rise>
+        <Deck />
+        <View style={{ paddingHorizontal: 28, paddingTop: 8, gap: 14 }}>
+          <Rise delay={200}>
+            <Chroma size={38} echoes={[C.violet, C.accent]}>
+              A fresh workout every day, built around how you feel.
+            </Chroma>
+          </Rise>
+          <Rise delay={300}>
+            <T style={{ fontSize: 16, lineHeight: 23, color: C.muted }}>
+              Tell us what’s sore and how much time you have. We’ll pick the
+              moves.
+            </T>
+          </Rise>
         </View>
         <View style={{ padding: 24, paddingBottom: 28, gap: 14 }}>
-          <Button title="Get started" onPress={next} />
+          <Button title="Get started" icon="arrow" shine onPress={next} style={{ minHeight: 62 }} />
           <T style={{ textAlign: "center", color: C.muted, fontSize: 14 }}>
             14 days free · No account or payment details
           </T>
@@ -219,7 +273,10 @@ export function Onboarding() {
       ) : (
         <Button
           title="Continue"
-          disabled={step === "where" && !home && !gym}
+          disabled={
+            (step === "where" && !home && !gym) ||
+            (step === "style" && routine === "custom" && !validSchedule(schedule))
+          }
           onPress={next}
         />
       )}
@@ -237,8 +294,9 @@ export function Onboarding() {
         }
       />
       <ScrollView
-        contentContainerStyle={{ padding: 24, paddingTop: 20, gap: 24 }}
+        contentContainerStyle={{ padding: 24, paddingTop: 20 }}
       >
+        <Rise key={step} from={30} style={{ gap: 24 }}>
         {step === "level" && (
           <>
             <Intro
@@ -254,7 +312,7 @@ export function Onboarding() {
                   subtitle={body}
                   selected={level === l}
                   onPress={() => setLevel(l)}
-                  trailing={<LevelBars level={(i + 1) as 1 | 2 | 3} />}
+                  trailing={<LevelBars level={(i + 1) as 1 | 2 | 3} color={level === l ? C.accent : C.ink} />}
                 />
               ))}
             </View>
@@ -284,7 +342,36 @@ export function Onboarding() {
               >
                 <Week days={["Up", "Leg", "", "Up", "Leg", "", ""]} />
               </OptionCard>
+              <OptionCard
+                title="Kwik Pick every day"
+                subtitle="No plan to set. Each day, Kwik Pick chooses moves from what you’ve recovered for, and suggests rest when you need it."
+                selected={routine === "kwik"}
+                onPress={() => setRoutine("kwik")}
+              >
+                <Week days={["?", "?", "?", "?", "?", "?", "?"]} />
+              </OptionCard>
+              <OptionCard
+                title="Custom week"
+                subtitle="Give each day its own focus: full body, upper, legs, chosen muscles, Kwik Pick or rest."
+                selected={routine === "custom"}
+                onPress={() => setRoutine("custom")}
+              >
+                <Week days={["Arms", "Legs", "", "Back", "?", "", ""]} />
+              </OptionCard>
             </View>
+            {routine === "custom" && (
+              <View style={{ gap: 10 }}>
+                <T style={[s.small, s.muted]}>
+                  Tap a day to set its focus.
+                </T>
+                <WeekEditor schedule={schedule} onChange={setSchedule} />
+                {!validSchedule(schedule) && (
+                  <T accessibilityRole="alert" style={{ color: C.danger, fontSize: 14 }}>
+                    Pick at least one muscle for each custom muscle day.
+                  </T>
+                )}
+              </View>
+            )}
           </>
         )}
         {step === "where" && (
@@ -301,7 +388,7 @@ export function Onboarding() {
                   ["At a gym", "gym", gym, setGym],
                 ] as const
               ).map(([title, icon, on, set]) => (
-                <Pressable
+                <Squish
                   key={title}
                   accessibilityRole="checkbox"
                   accessibilityLabel={title}
@@ -310,23 +397,28 @@ export function Onboarding() {
                   style={{
                     flex: 1,
                     borderRadius: R.card,
-                    backgroundColor: C.surface,
+                    backgroundColor: on ? "#1A1F12" : C.surface,
                     borderWidth: 2,
                     borderColor: on ? C.accent : C.line,
                     padding: 6,
                     gap: 10,
+                    ...(on ? { boxShadow: "0 10px 28px rgba(192,244,71,0.18)" } : {}),
                   }}
                 >
                   <View
                     style={{
-                      height: 96,
+                      height: 110,
                       borderRadius: R.card - 6,
-                      backgroundColor: C.plate,
+                      overflow: "hidden",
+                      backgroundColor: C.surface2,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <Icon name={icon} color={C.plateIcon} size={36} />
+                    {on && <Poster theme={icon === "gym" ? focusTheme.upper : focusTheme.full} watermark={false} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 0 }}><View /></Poster>}
+                    <View style={{ transform: [{ rotate: on ? "-8deg" : "0deg" }, { scale: on ? 1.15 : 1 }] }}>
+                      <Icon name={icon} color={on ? C.onAccent : C.muted} size={40} />
+                    </View>
                   </View>
                   <View
                     style={[
@@ -339,7 +431,7 @@ export function Onboarding() {
                     </T>
                     <Check on={on} />
                   </View>
-                </Pressable>
+                </Squish>
               ))}
             </View>
           </>
@@ -426,6 +518,7 @@ export function Onboarding() {
             <PainCheck value={pain} onChange={setPain} />
           </>
         )}
+        </Rise>
       </ScrollView>
       {footer}
     </View>

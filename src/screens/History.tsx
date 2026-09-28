@@ -1,6 +1,6 @@
 import { displayWeight, weightUnit } from "../domain/weightUnits";
 import React, { useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import {
   Button,
   C,
@@ -15,9 +15,12 @@ import {
   s,
   sizes,
   R,
+  focusTheme,
 } from "../components/ui";
+import { Aurora, Chroma, CountUp, Rise, Squish } from "../components/motion";
+import { BodyFigure } from "../components/BodyMap";
 import { useStore } from "../state/store";
-import { Session, focusLabels } from "../domain/types";
+import { Muscle, Session, focusLabels } from "../domain/types";
 import { exerciseById } from "../data/exercises";
 import { weekCount } from "../domain/engine";
 import { dayKey, muscleName, recovery } from "../domain/today";
@@ -25,6 +28,44 @@ import { dayKey, muscleName, recovery } from "../domain/today";
 const effortLabel = { easy: "Too easy", right: "Just right", hard: "Too hard" };
 const minutesOf = (s: Session) =>
   Math.max(1, Math.round(((s.endedAt ?? s.startedAt) - s.startedAt) / 60000));
+// Front and back figures with recovering muscles lit up; everything else reads as ready.
+function RecoveryMap({ recovering }: { recovering: Muscle[] }) {
+  const fillFor = (m: Muscle) => (recovering.includes(m) ? C.accent : undefined);
+  return (
+    <View style={{ gap: 10, alignItems: "center" }}>
+      <View
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel={
+          recovering.length
+            ? `Body diagram. Recovering: ${recovering.map(muscleName).join(", ")}.`
+            : "Body diagram. Every muscle is ready."
+        }
+        style={[s.row, { gap: 20, justifyContent: "center" }]}
+      >
+        {(["front", "back"] as const).map((side) => (
+          <View key={side} style={{ alignItems: "center", gap: 4 }}>
+            <BodyFigure side={side} height={230} fillFor={fillFor} />
+            <T style={[s.small, s.muted]}>{side === "front" ? "Front" : "Back"}</T>
+          </View>
+        ))}
+      </View>
+      <View style={[s.row, { gap: 16 }]}>
+        {[
+          { color: C.accent, label: "Recovering" },
+          { color: C.region, label: "Ready" },
+        ].map((k) => (
+          <View key={k.label} style={[s.row, { gap: 6 }]}>
+            <View
+              style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: k.color }}
+            />
+            <T style={[s.small, s.muted]}>{k.label}</T>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
 function SessionDetail({
   session,
   onBack,
@@ -115,9 +156,11 @@ function Week({ history }: { history: Session[] }) {
             <View
               accessibilityLabel={`${d.toLocaleDateString("en-US", { weekday: "long" })}${done ? ", trained" : ""}`}
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: R.card,
+                width: 38,
+                height: 44,
+                borderRadius: 10,
+                transform: [{ skewX: "-8deg" }],
+                ...(done ? { boxShadow: `0 6px 18px ${isToday ? "rgba(192,244,71,0.45)" : "rgba(247,247,242,0.18)"}` } : {}),
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor:
@@ -135,8 +178,8 @@ function Week({ history }: { history: Session[] }) {
             >
               <T
                 style={{
-                  fontSize: 13,
-                  fontFamily: done ? fonts.semibold : fonts.body,
+                  fontSize: 15,
+                  fontFamily: done ? fonts.black : fonts.semibold,
                   color: done
                     ? isToday
                       ? C.onAccent
@@ -176,29 +219,41 @@ export function History({ go }: { go: (route: string) => void }) {
   const goal = data.profile?.weeklyGoal ?? 3,
     week = weekCount(data);
   return (
+    <View style={{ flex: 1 }}>
+    <Aurora colors={[C.violet, C.accent, C.coral]} intensity={0.2} height={360} />
     <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-      <View style={[s.between, { paddingHorizontal: 24, paddingTop: 12 }]}>
-        <Heading size={sizes.title}>History</Heading>
-        <T style={{ color: C.muted, fontSize: 14 }}>
-          {week} of {goal} this week
-        </T>
-      </View>
-      <Week history={data.history} />
-      <View
+      <Rise style={[s.between, { paddingHorizontal: 24, paddingTop: 14, alignItems: "flex-end" }]}>
+        <Chroma size={46} echoes={[C.violet, C.coral]}>History</Chroma>
+        <View style={{ alignItems: "flex-end", paddingBottom: 6 }}>
+          <T style={{ fontSize: 26, lineHeight: 28, fontFamily: fonts.black, color: week >= goal ? C.accent : C.ink }}>
+            {week}<T style={{ fontSize: 16, color: C.muted, fontFamily: fonts.bold }}>/{goal}</T>
+          </T>
+          <T style={{ color: C.muted, fontSize: 12 }}>this week</T>
+        </View>
+      </Rise>
+      <Rise delay={80}>
+        <Week history={data.history} />
+      </Rise>
+      <Rise
+        delay={160}
         style={{
           flexDirection: "row",
           gap: 8,
           paddingHorizontal: 20,
-          paddingTop: 20,
+          paddingTop: 22,
         }}
       >
         <Stat
-          value={thisMonth}
+          accent
+          value={<CountUp value={thisMonth} style={{ fontSize: 34, lineHeight: 40, fontFamily: fonts.black, letterSpacing: -1.2, color: C.onAccent }} />}
           label={`workouts in ${now.toLocaleDateString("en-US", { month: "long" })}`}
         />
-        <Stat value={distinct} label="different exercises" />
-      </View>
-      <View
+        <Stat
+          value={<CountUp value={distinct} delay={100} style={{ fontSize: 34, lineHeight: 40, fontFamily: fonts.black, letterSpacing: -1.2, color: C.ink }} />}
+          label="different exercises"
+        />
+      </Rise>
+      <Rise delay={240}
         style={{
           marginHorizontal: 20,
           marginTop: 12,
@@ -210,7 +265,8 @@ export function History({ go }: { go: (route: string) => void }) {
           gap: 12,
         }}
       >
-        <T style={{ fontSize: 15, fontFamily: fonts.semibold }}>Recovery</T>
+        <T style={{ fontSize: 17, fontFamily: fonts.bold }}>Recovery</T>
+        <RecoveryMap recovering={recovering} />
         {recovering.length ? (
           <View style={{ gap: 8 }}>
             <T style={[s.small, s.muted]}>Recovering</T>
@@ -229,7 +285,7 @@ export function History({ go }: { go: (route: string) => void }) {
             {ready.map(muscleName).join(", ")}
           </T>
         )}
-      </View>
+      </Rise>
       <T style={[s.sectionTitle, { paddingHorizontal: 24, paddingTop: 22 }]}>
         Recent
       </T>
@@ -246,30 +302,35 @@ export function History({ go }: { go: (route: string) => void }) {
           />
         </View>
       ) : (
-        <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
+        <View style={{ paddingHorizontal: 20, paddingTop: 10, gap: 8 }}>
           {data.history
             .slice()
             .reverse()
             .slice(0, 30)
-            .map((session, i, list) => {
+            .map((session, i) => {
               const d = new Date(session.startedAt);
+              const tint = focusTheme[session.focus].tint;
               return (
-                <Pressable
-                  key={session.id}
+                <Rise key={session.id} delay={Math.min(i, 8) * 50 + 280}>
+                <Squish
                   accessibilityRole="button"
                   accessibilityLabel={`View workout from ${d.toLocaleDateString()}`}
                   onPress={() => setSelected(session)}
-                  style={({ pressed }) => ({
+                  scaleTo={0.97}
+                  style={{
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 14,
                     paddingVertical: 12,
-                    paddingHorizontal: 4,
-                    borderBottomWidth: i < list.length - 1 ? 1 : 0,
-                    borderBottomColor: C.line,
-                    opacity: pressed ? 0.7 : 1,
-                  })}
+                    paddingHorizontal: 14,
+                    borderRadius: R.control,
+                    backgroundColor: C.surface,
+                    borderWidth: 1,
+                    borderColor: C.line2,
+                    overflow: "hidden",
+                  }}
                 >
+                  <View style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, backgroundColor: tint }} />
                   <View style={{ width: 40, alignItems: "center" }}>
                     <T
                       style={{
@@ -285,16 +346,17 @@ export function History({ go }: { go: (route: string) => void }) {
                     </T>
                     <T
                       style={{
-                        fontSize: 18,
-                        lineHeight: 22,
-                        fontFamily: fonts.bold,
+                        fontSize: 22,
+                        lineHeight: 26,
+                        fontFamily: fonts.black,
+                        color: tint,
                       }}
                     >
                       {d.getDate()}
                     </T>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <T style={{ fontSize: 15, fontFamily: fonts.semibold }}>
+                    <T style={{ fontSize: 16, fontFamily: fonts.bold }}>
                       {focusLabels[session.focus]}
                     </T>
                     <T style={[s.small, s.muted]}>
@@ -304,11 +366,13 @@ export function History({ go }: { go: (route: string) => void }) {
                     </T>
                   </View>
                   <Icon name="chevron" size={16} color={C.faint} />
-                </Pressable>
+                </Squish>
+                </Rise>
               );
             })}
         </View>
       )}
     </ScrollView>
+    </View>
   );
 }

@@ -10,44 +10,10 @@ import {
   ViewStyle,
 } from "react-native";
 import Svg, { Path, Circle, Rect } from "react-native-svg";
-// Dark theme from the Kwikroutine design: near-black surfaces, one lime accent.
-export const C = {
-  bg: "#0C0C0D",
-  surface: "#18181A",
-  surface2: "#242427",
-  line: "#2E2E32",
-  line2: "#232326",
-  ink: "#F5F5F2",
-  muted: "#A0A0A6",
-  faint: "#65656B",
-  body: "#1E1E21",
-  region: "#34343A",
-  stripeA: "#1A1A1D",
-  stripeB: "#212124",
-  bar: "#111113",
-  accent: "#C0F447",
-  accentSoft: "rgba(192,244,71,0.14)",
-  onAccent: "#0D0D0E",
-  mild: "#F5B75B",
-  moderate: "#FA7C20",
-  severe: "#F13A32",
-  danger: "#FF7A6E",
-  // Light backdrop behind photos and illustrations, so every picture sits on the same plate.
-  plate: "#ECECE8",
-  plateIcon: "#8C8C92",
-};
-// One radius per kind of surface: tags, chips, controls (buttons/inputs/tiles), cards, sheets.
-export const R = { tag: 8, chip: 12, control: 16, card: 20, sheet: 28 };
-// Heading sizes: hero moments, screen titles, titles inside cards.
-export const sizes = { display: 34, title: 30, card: 26 };
-export const fonts = {
-  body: "Outfit_400Regular",
-  medium: "Outfit_500Medium",
-  semibold: "Outfit_600SemiBold",
-  bold: "Outfit_700Bold",
-  black: "Outfit_800ExtraBold",
-  mono: "DMMono_500Medium",
-};
+import { LinearGradient } from "expo-linear-gradient";
+import { C, R, fonts, sizes } from "./theme";
+import { Chroma, Shine, Squish } from "./motion";
+export { C, R, fonts, sizes, focusTheme } from "./theme";
 export function T({ style, ...props }: TextProps) {
   return (
     <Text
@@ -191,19 +157,22 @@ export function Icon({
     ),
     refresh: <Path d="M20 8a9 9 0 1 0 0 8M20 3v5h-5" />,
   };
+  // Wrapped in a View so it stacks above absolutely positioned layers (gradients) on web.
   return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {paths[name]}
-    </Svg>
+    <View style={{ width: size, height: size }}>
+      <Svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {paths[name]}
+      </Svg>
+    </View>
   );
 }
 // Logo direction 2c: three rising, slanted bars, the level indicator used across the app.
@@ -211,8 +180,9 @@ export function LogoMark({ size = 36 }: { size?: number }) {
   const k = size / 36;
   return (
     <View
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
+      {...(Platform.OS === "web"
+        ? { "aria-hidden": true }
+        : { accessibilityElementsHidden: true, importantForAccessibility: "no-hide-descendants" as const })}
       style={{
         width: size,
         height: size,
@@ -311,8 +281,8 @@ export function Segments({
   total,
   done,
   current,
-  height = 4,
-  gap = 6,
+  height = 5,
+  gap = 5,
 }: {
   total: number;
   done: number;
@@ -321,15 +291,16 @@ export function Segments({
   gap?: number;
 }) {
   return (
-    <View style={{ flexDirection: "row", gap, flex: 1 }}>
+    <View style={{ flexDirection: "row", gap, flex: 1, transform: [{ skewX: "-24deg" }] }}>
       {Array.from({ length: total }, (_, i) => (
         <View
           key={i}
           style={{
             flex: 1,
             height,
-            borderRadius: height / 2,
+            borderRadius: 1.5,
             backgroundColor: i < done || i === current ? C.accent : C.line,
+            ...(i === (current ?? done - 1) ? { boxShadow: "0 0 10px rgba(192,244,71,0.6)" } : {}),
           }}
         />
       ))}
@@ -423,6 +394,8 @@ export function Button({
   busy = false,
   icon,
   detail,
+  shine = false,
+  dark,
   style,
   testID,
 }: {
@@ -434,50 +407,69 @@ export function Button({
   busy?: boolean;
   icon?: IconName;
   detail?: string;
+  // A glint that sweeps across the button now and then, for the one action that matters most.
+  shine?: boolean;
+  // Near-black button for use on top of a bright poster; the value is its text color.
+  dark?: string;
   style?: ViewStyle;
   testID?: string;
 }) {
   const off = disabled && !busy;
-  const fg = off ? C.faint : ghost ? C.muted : secondary ? C.ink : C.onAccent;
+  const primary = !ghost && !secondary && !off && !dark;
+  const fg = off ? C.faint : dark ?? (ghost ? C.muted : secondary ? C.ink : C.onAccent);
   return (
-    <Pressable
+    <Squish
       testID={testID}
       accessibilityRole="button"
       accessibilityLabel={title}
       accessibilityState={{ disabled: disabled || busy }}
       disabled={disabled || busy}
       onPress={onPress}
-      style={({ pressed }) => [
+      haptic={!ghost}
+      style={[
         s.button,
         ghost
           ? { backgroundColor: "transparent" }
+          : dark && !off
+            ? { backgroundColor: C.onAccent, boxShadow: "0 10px 24px rgba(0,0,0,0.3)" }
           : off
             ? { backgroundColor: C.surface2 }
             : secondary
               ? {
                   backgroundColor: C.surface,
-                  borderWidth: 1,
+                  borderWidth: 1.5,
                   borderColor: C.line,
                 }
-              : { backgroundColor: C.accent },
-        { opacity: pressed ? 0.8 : 1 },
+              : { backgroundColor: C.accent, boxShadow: "0 10px 28px rgba(192,244,71,0.28)" },
         style,
       ]}
     >
+      {primary && (
+        <View style={[StyleSheet.absoluteFill, { borderRadius: R.control, overflow: "hidden" }]}>
+          <LinearGradient
+            colors={["#D6FF63", C.accent, C.accentDeep]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          {shine && <Shine />}
+        </View>
+      )}
       {busy ? (
         <ActivityIndicator color={fg} />
       ) : (
         <>
           <T
             style={{
-              fontFamily: secondary || ghost ? fonts.semibold : fonts.bold,
+              fontFamily: secondary || ghost ? fonts.semibold : fonts.black,
               color: fg,
               fontSize: 17,
+              letterSpacing: primary ? -0.2 : 0,
             }}
           >
             {title}
             {!!detail && (
-              <T style={{ color: fg, opacity: 0.6, fontSize: 14 }}>
+              <T style={{ color: fg, opacity: 0.6, fontSize: 14, fontFamily: fonts.semibold }}>
                 {"  ·  "}
                 {detail}
               </T>
@@ -486,7 +478,7 @@ export function Button({
           {icon && <Icon name={icon} color={fg} size={20} />}
         </>
       )}
-    </Pressable>
+    </Squish>
   );
 }
 export function Chip({
@@ -501,34 +493,32 @@ export function Chip({
   small?: boolean;
 }) {
   return (
-    <Pressable
+    <Squish
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected }}
       {...(Platform.OS === "web" ? { "aria-pressed": selected } : {})}
       onPress={onPress}
-      style={({ pressed }) => [
-        {
-          borderWidth: 1.5,
-          borderColor: selected ? C.accent : C.line,
-          backgroundColor: selected ? C.accentSoft : C.surface,
-          paddingHorizontal: small ? 11 : 14,
-          paddingVertical: small ? 5.5 : 8.5,
-          borderRadius: R.chip,
-          opacity: pressed ? 0.8 : 1,
-        },
-      ]}
+      scaleTo={0.93}
+      style={{
+        borderWidth: 1.5,
+        borderColor: selected ? C.accent : C.line,
+        backgroundColor: selected ? C.accent : C.surface,
+        paddingHorizontal: small ? 12 : 15,
+        paddingVertical: small ? 5.5 : 8.5,
+        borderRadius: 999,
+      }}
     >
       <T
         style={{
-          color: C.ink,
+          color: selected ? C.onAccent : C.ink,
           fontSize: small ? 13 : 14,
-          fontFamily: fonts.semibold,
+          fontFamily: selected ? fonts.bold : fonts.semibold,
         }}
       >
         {label}
       </T>
-    </Pressable>
+    </Squish>
   );
 }
 // Static muscle / tag pill.
@@ -635,11 +625,11 @@ export function PageTitle({
   size?: number;
 }) {
   return (
-    <View style={{ gap: 8 }}>
-      {!!eyebrow && <Label style={{ fontSize: 12 }}>{eyebrow}</Label>}
-      <Heading size={size}>{title}</Heading>
+    <View style={{ gap: 12 }}>
+      {!!eyebrow && <Tape>{eyebrow}</Tape>}
+      <Chroma size={size} echoes={[C.violet]}>{title}</Chroma>
       {!!subtitle && (
-        <T style={{ color: C.muted, fontSize: 15, lineHeight: 22 }}>{subtitle}</T>
+        <T style={{ color: C.muted, fontSize: 16, lineHeight: 23 }}>{subtitle}</T>
       )}
     </View>
   );
@@ -678,20 +668,21 @@ export function OptionCard({
   trailing?: React.ReactNode;
 }) {
   return (
-    <Pressable
+    <Squish
       accessibilityRole={role}
       accessibilityLabel={title}
       accessibilityState={{ checked: selected }}
       {...(Platform.OS === "web" ? { "aria-checked": selected } : {})}
       onPress={onPress}
-      style={({ pressed }) => ({
+      scaleTo={0.975}
+      style={{
         padding: 16,
         borderRadius: R.card,
-        backgroundColor: C.surface,
+        backgroundColor: selected ? "#1A1F12" : C.surface,
         borderWidth: 2,
         borderColor: selected ? C.accent : C.line,
-        opacity: pressed ? 0.85 : 1,
-      })}
+        ...(selected ? { boxShadow: "0 0 0 4px rgba(192,244,71,0.10)" } : {}),
+      }}
     >
       <View style={{ flexDirection: "row", gap: 14, alignItems: "center" }}>
         <View style={{ flex: 1, gap: 3 }}>
@@ -704,7 +695,7 @@ export function OptionCard({
         {role === "radio" ? <Radio on={selected} /> : <Check on={selected} />}
       </View>
       {children}
-    </Pressable>
+    </Squish>
   );
 }
 export function Radio({ on }: { on: boolean }) {
@@ -887,7 +878,7 @@ export function Stat({
   accent = false,
   style,
 }: {
-  value: string | number;
+  value: string | number | React.ReactNode;
   label: string;
   accent?: boolean;
   style?: ViewStyle;
@@ -898,32 +889,90 @@ export function Stat({
         {
           flex: 1,
           padding: 14,
+          paddingTop: 12,
           borderRadius: R.card,
-          backgroundColor: accent ? C.accentSoft : C.surface,
+          backgroundColor: accent ? C.accent : C.surface,
           borderWidth: accent ? 0 : 1,
           borderColor: C.line2,
+          overflow: "hidden",
+        },
+        style,
+      ]}
+    >
+      {accent && (
+        <LinearGradient
+          colors={["#D6FF63", C.accent, "#7EE0A0"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
+      {typeof value === "object" ? (
+        value
+      ) : (
+        <T
+          style={{
+            fontSize: 34,
+            lineHeight: 40,
+            fontFamily: fonts.black,
+            letterSpacing: -1.2,
+            color: accent ? C.onAccent : C.ink,
+          }}
+        >
+          {value}
+        </T>
+      )}
+      <T
+        style={{
+          fontSize: 13,
+          lineHeight: 17,
+          fontFamily: fonts.medium,
+          color: accent ? "rgba(13,13,14,0.7)" : C.muted,
+        }}
+      >
+        {label}
+      </T>
+    </View>
+  );
+}
+// Slanted sticker label, the logo's lean applied to a caption.
+export function Tape({
+  children,
+  color = C.accent,
+  ink = C.onAccent,
+  style,
+}: {
+  children: React.ReactNode;
+  color?: string;
+  ink?: string;
+  style?: ViewStyle;
+}) {
+  return (
+    <View
+      style={[
+        {
+          alignSelf: "flex-start",
+          backgroundColor: color,
+          paddingHorizontal: 9,
+          paddingVertical: 3,
+          borderRadius: 3,
+          transform: [{ skewX: "-12deg" }],
         },
         style,
       ]}
     >
       <T
         style={{
-          fontSize: 26,
-          lineHeight: 32,
-          fontFamily: fonts.bold,
-          letterSpacing: -0.5,
+          color: ink,
+          fontFamily: fonts.mono,
+          fontSize: 11,
+          lineHeight: 15,
+          letterSpacing: 0.9,
+          textTransform: "uppercase",
+          transform: [{ skewX: "12deg" }],
         }}
       >
-        {value}
-      </T>
-      <T
-        style={{
-          fontSize: 13,
-          lineHeight: 17,
-          color: accent ? C.accent : C.muted,
-        }}
-      >
-        {label}
+        {children}
       </T>
     </View>
   );

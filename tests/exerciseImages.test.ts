@@ -5,7 +5,7 @@ import { runInNewContext } from 'node:vm';
 import { createHash } from 'node:crypto';
 import ts from 'typescript';
 import { exercises } from '../src/data/exercises';
-import type { Exercise } from '../src/domain/types';
+import { EQUIPMENT, type Equipment, type Exercise } from '../src/domain/types';
 
 // Execute the actual Metro image modules, replacing asset IDs with local paths.
 // This catches missing mappings, broken imports and absent files without React Native.
@@ -22,6 +22,13 @@ function loadImageModule(file: string): Record<string, unknown> {
   return exports;
 }
 
+function expectImage(picture: string) {
+  const bytes = readFileSync(picture);
+  expect(bytes.length, picture).toBeGreaterThan(1000);
+  const signature = bytes.subarray(0, 4).toString('hex');
+  expect(signature === '89504e47' || signature.startsWith('ffd8ff'), picture).toBe(true);
+}
+
 describe('complete offline exercise pictures', () => {
   it('resolves a real local image for every exercise through the production resolver', () => {
     const { picturesFor } = loadImageModule(resolve('src/data/picturesFor.ts')) as {
@@ -31,12 +38,17 @@ describe('complete offline exercise pictures', () => {
     for (const exercise of exercises) {
       const pictures = picturesFor(exercise);
       expect(pictures.length, exercise.id).toBeGreaterThan(0);
-      for (const picture of pictures) {
-        const bytes = readFileSync(picture);
-        expect(bytes.length, picture).toBeGreaterThan(1000);
-        const signature = bytes.subarray(0, 4).toString('hex');
-        expect(signature === '89504e47' || signature.startsWith('ffd8ff'), picture).toBe(true);
-      }
+      for (const picture of pictures) expectImage(picture);
+    }
+  });
+  it('resolves a real local image for every equipment choice', () => {
+    const { equipmentPicture } = loadImageModule(resolve('src/data/equipmentImages.ts')) as {
+      equipmentPicture: (equipment: Equipment) => string | undefined;
+    };
+    for (const equipment of EQUIPMENT) {
+      const picture = equipmentPicture(equipment);
+      expect(picture, equipment).toBeTruthy();
+      expectImage(picture!);
     }
   });
   it('keeps provenance and distinct artwork for each new illustration', () => {

@@ -51,7 +51,7 @@ export const dataSchema: z.ZodType<AppData> = z.object({
   profile: z
     .object({
       level: z.enum(["beginner", "intermediate", "advanced"]),
-      routine: z.enum(["full", "split", "custom"]),
+      routine: z.enum(["full", "split", "kwik", "custom"]),
       schedule: schedule.optional(),
       weeklyGoal: z.number().int().min(1).max(7),
       weightUnit: z.enum(['lb', 'kg']).optional(),
@@ -105,4 +105,5 @@ export const dataSchema: z.ZodType<AppData> = z.object({
     .nullable()
     .optional(),
   workoutOverride: z.object({ day: z.string(), plan: dayPlan }).nullable().optional(),
+  restDecision: z.object({ day: z.string(), basis: z.string(), rest: z.boolean() }).nullable().optional(),
 });

@@ -1,6 +1,4 @@
-import { equipmentPictures } from "../data/equipmentPictures";
-import { exerciseImages } from "../data/exerciseImages";
-import { equipmentImageIds } from "../data/equipmentImages";
+import { equipmentPicture } from "../data/equipmentImages";
 import React, { useState } from "react";
 import { Image, Platform, Pressable, TextInput, View } from "react-native";
 import { Equipment, EQUIPMENT, equipmentLabels } from "../domain/types";
@@ -49,7 +47,7 @@ function Tile({
   icon?: "home" | "gym";
   equipment?: Equipment;
 }) {
-  const picture = equipment && equipmentPictures[equipment] ? equipmentPictures[equipment] : equipment === "rack" ? require("../../assets/commons/power-rack.jpg") : equipment === "chair" ? require("../../assets/commons/chair-squat.png") : equipment && exerciseImages[equipmentImageIds[equipment] ?? ""]?.[0];
+  const picture = equipment && equipmentPicture(equipment);
   return (
     <Pressable
       accessibilityRole="button"

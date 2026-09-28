@@ -4,15 +4,15 @@ import { ScrollView, View } from "react-native";
 import {
   C,
   Chip,
-  Heading,
   Label,
   ListGroup,
   ListRow,
   LogoMark,
   T,
+  Tape,
   s,
-  sizes,
 } from "../components/ui";
+import { Aurora, Chroma, Rise } from "../components/motion";
 import { useStore } from "../state/store";
 import { Level, equipmentLabels, titleCase, routineLabels } from "../domain/types";
 import { exerciseById } from "../data/exercises";
@@ -71,18 +71,22 @@ export function Profile({ go }: { go: (route: string) => void }) {
     </View>
   );
   return (
+    <View style={{ flex: 1 }}>
+    <Aurora colors={[C.accent, C.violet, C.cyan]} intensity={0.18} height={300} />
     <ScrollView
-      contentContainerStyle={{ padding: 20, paddingTop: 12, gap: 22 }}
+      contentContainerStyle={{ padding: 20, paddingTop: 14, gap: 22 }}
     >
-      <View style={[s.row, { gap: 14, paddingHorizontal: 4 }]}>
-        <LogoMark size={56} />
-        <View>
-          <Heading size={sizes.title}>Profile</Heading>
-          <T style={[s.muted, { fontSize: 14 }]}>
-            {levelNames[profile.level]} · {styleNames[profile.routine]}
-          </T>
+      <Rise style={[s.row, { gap: 16, paddingHorizontal: 4 }]}>
+        <View style={{ transform: [{ rotate: "-6deg" }], boxShadow: "0 10px 30px rgba(192,244,71,0.25)", borderRadius: 18 }}>
+          <LogoMark size={64} />
         </View>
-      </View>
+        <View style={{ gap: 6 }}>
+          <Chroma size={40} echoes={[C.violet, C.accent]}>Profile</Chroma>
+          <Tape color={C.surface2} ink={C.muted}>
+            {levelNames[profile.level]} · {styleNames[profile.routine]}
+          </Tape>
+        </View>
+      </Rise>
       <Section title="Training">
         <ListGroup>
           <View>
@@ -235,5 +239,6 @@ export function Profile({ go }: { go: (route: string) => void }) {
         </T>
       )}
     </ScrollView>
+    </View>
   );
 }

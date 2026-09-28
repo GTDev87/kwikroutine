@@ -33,6 +33,50 @@ const tap = (fn: () => void): object =>
     ? { onClick: fn, onPress: null, style: { cursor: "pointer" } }
     : { onPress: fn };
 export const soreColors = ["transparent", C.mild, C.moderate, C.severe] as const;
+// One side of the body. Muscles without a fill use the neutral region colour.
+export function BodyFigure({
+  side,
+  height,
+  fillFor,
+  onPress,
+  label,
+}: {
+  side: "front" | "back";
+  height: number;
+  fillFor: (m: Muscle) => string | undefined;
+  onPress?: (m: Muscle) => void;
+  label?: (m: Muscle) => string;
+}) {
+  const parts = side === "front" ? bodyFront : bodyBack;
+  return (
+    <Svg
+      width={height / 2}
+      height={height}
+      viewBox={side === "front" ? "40 60 644 1340" : "764 60 644 1340"}
+    >
+      {parts.map((p, i) => {
+        const m = SLUG[p.s];
+        const fill = m
+          ? (fillFor(m) ?? C.region)
+          : p.s === "hair"
+            ? C.region
+            : C.body;
+        const paths = p.d.map((d, j) => <Path key={j} d={d} fill={fill} />);
+        return m && onPress ? (
+          <G
+            key={`${side}-${i}`}
+            {...tap(() => onPress(m))}
+            accessibilityLabel={label?.(m)}
+          >
+            {paths}
+          </G>
+        ) : (
+          <G key={`${side}-${i}`}>{paths}</G>
+        );
+      })}
+    </Svg>
+  );
+}
 const next = (level: number) => ((level + 1) % 4) as 0 | SoreLevel;
 function Dot({ level, size = 8 }: { level: number; size?: number }) {
   return (
@@ -69,7 +113,6 @@ export function BodyMap({
   const describe = (m: Muscle) =>
     `${muscleName(m)}, ${levelOf(m) ? soreLevelLabels[levelOf(m)].toLowerCase() : "not sore"}`;
   const sore = MUSCLES.filter((m) => levelOf(m));
-  const parts = side === "front" ? bodyFront : bodyBack;
   return (
     <View style={{ gap: 12, alignItems: "center" }}>
       <View
@@ -118,34 +161,13 @@ export function BodyMap({
           </View>
         ))}
       </View>
-      <Svg
-        width={height / 2}
+      <BodyFigure
+        side={side}
         height={height}
-        viewBox={side === "front" ? "40 60 644 1340" : "764 60 644 1340"}
-      >
-        {parts.map((p, i) => {
-          const m = SLUG[p.s];
-          const fill = m
-            ? levelOf(m)
-              ? soreColors[levelOf(m)]
-              : C.region
-            : p.s === "hair"
-              ? C.region
-              : C.body;
-          const paths = p.d.map((d, j) => <Path key={j} d={d} fill={fill} />);
-          return m ? (
-            <G
-              key={`${side}-${i}`}
-              {...tap(() => cycle(m))}
-              accessibilityLabel={describe(m)}
-            >
-              {paths}
-            </G>
-          ) : (
-            <G key={`${side}-${i}`}>{paths}</G>
-          );
-        })}
-      </Svg>
+        fillFor={(m) => (levelOf(m) ? soreColors[levelOf(m)] : undefined)}
+        onPress={cycle}
+        label={describe}
+      />
       <T style={[s.small, s.muted, { textAlign: "center" }]}>
         {sore.length
           ? "Tap again to change how sore it is."

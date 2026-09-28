@@ -1,4 +1,7 @@
 import { Equipment } from '../domain/types';
+import { equipmentPictures } from './equipmentPictures';
+import { exerciseImages } from './exerciseImages';
+import { supplementalExerciseImages } from './supplementalExerciseImages';
 // Identification examples showing the station in use, not manufacturer-specific models.
 export const equipmentImageIds: Partial<Record<Equipment, string>> = {
   mat: 'plank', dumbbells: 'bicep-curl', bands: 'band-pull-apart', bench: 'db-bench-press',
@@ -18,5 +21,16 @@ export const equipmentImageIds: Partial<Record<Equipment, string>> = {
   'shrug-machine': 'plate-loaded-shrug', 'seated-calf-machine': 'seated-calf-raise', 'wrist-roller': 'wrist-roller',
   'seated-leg-curl': 'seated-leg-curl', 'roman-chair': 'back-extension', 'captains-chair': 'captains-chair-knee-raise',
   'preacher-bench': 'preacher-curl', 'decline-bench': 'decline-bench-press', 'adjustable-bench': 'incline-db-press',
-  landmine: 'landmine-press',
+  landmine: 'landmine-press', 'row-machine': 'machine-row',
 };
+const commonsPictures: Partial<Record<Equipment, number>> = {
+  rack: require('../../assets/commons/power-rack.jpg'),
+  chair: require('../../assets/commons/chair-squat.png'),
+};
+// Dedicated cutout first, then a photo of the station in use.
+export function equipmentPicture(equipment: Equipment): number | undefined {
+  const id = equipmentImageIds[equipment] ?? '';
+  return equipmentPictures[equipment]
+    ?? commonsPictures[equipment]
+    ?? (supplementalExerciseImages[id] ?? exerciseImages[id])?.[0];
+}

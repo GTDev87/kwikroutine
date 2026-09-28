@@ -137,7 +137,7 @@ describe('open “?” days', () => {
     expect(plan.rest).toBe(false);
     expect(plan.targets).not.toContain('quads');
     expect(plan.targets).toContain('chest');
-    expect(plan.why).toMatch(/Laya picks each move/);
+    expect(plan.why).toMatch(/Kwik Pick chooses each move/);
     const session = newSession(saved, 30, plan.focus, plan.targets, ['quads'], monday);
     expect(dataSchema.parse(JSON.parse(JSON.stringify({ ...saved, session }))).session!.focus).toBe('open');
     const options = eligible(saved, session, monday);
@@ -191,5 +191,65 @@ describe('soreness levels', () => {
     d.session.current = { exerciseId: ex.id, sets: [], plannedSets: 2 };
     const next = applyFeedback(d, 'sore', [], [], now);
     expect(next.session!.soreLevels!.quads).toBe(3);
+  });
+});
+
+describe('open days the app turns into rest days', () => {
+  const monday = new Date(2026, 8, 28, 12).getTime();
+  const openMonday = async () => {
+    const { defaultSchedule } = await import('../src/domain/routine');
+    const d = setup(); d.profile!.routine = 'custom'; d.profile!.schedule = defaultSchedule();
+    d.profile!.schedule.mon = { focus: 'open' };
+    return d;
+  };
+  const trained = (d: AppData, at: number) => d.history.push({ ...newSession(d, 30, 'full', ['chest'], [], at - 1800000), endedAt: at,
+    completed: [{ exerciseId: Object.keys(exerciseById)[0], sets: [{ reps: 10, weight: 0, effort: 'hard', at }], plannedSets: 2 }] });
+  it('only considers rest soon after training, or with soreness', async () => {
+    const { restOptions } = await import('../src/domain/restDay');
+    const d = await openMonday();
+    expect(restOptions(d, monday)).toBeNull();
+    trained(d, monday - 4 * 86400000);
+    expect(restOptions(d, monday)).toBeNull();
+    trained(d, monday - 20 * 3600000);
+    expect(restOptions(d, monday)!.state).toMatch(/hours since last workout: 20/);
+  });
+  it('rests only on a confident call, and trains when inference is missing', async () => {
+    const { resolveRest } = await import('../src/domain/restDay');
+    expect(resolveRest(null)).toBe(false);
+    expect(resolveRest({ train: .45, rest: .55 })).toBe(false);
+    expect(resolveRest({ train: .2, rest: .8 })).toBe(true);
+    expect(resolveRest({ train: .2, rest: NaN })).toBe(false);
+  });
+  it('shows a rest day for the decided check-in, persists, and lets you change today', async () => {
+    const { restBasis, restPending } = await import('../src/domain/today');
+    const d = await openMonday();
+    expect(restPending(d, monday)).toBe(true);
+    d.restDecision = { day: dayKey(monday), basis: restBasis(d, monday), rest: true };
+    const saved = dataSchema.parse(JSON.parse(JSON.stringify(d)));
+    expect(restPending(saved, monday)).toBe(false);
+    expect(todayFocus(saved, [], monday)).toMatchObject({ rest: true, auto: true, focus: 'open' });
+    // A new check-in asks again; until then the day stays open for training.
+    saved.checkIn = { day: dayKey(monday), sore: ['quads'], soreLevels: { quads: 2 }, pain: false };
+    expect(restPending(saved, monday)).toBe(true);
+    expect(todayFocus(saved, ['quads'], monday, { quads: 2 }).rest).toBe(false);
+    // Changing today, even to the app's pick, means training.
+    d.workoutOverride = { day: dayKey(monday), plan: { focus: 'open' } };
+    expect(restPending(d, monday)).toBe(false);
+    expect(todayFocus(d, [], monday).rest).toBe(false);
+  });
+});
+
+describe('Kwik Pick every day', () => {
+  it('makes every day open, persists, and can still turn a day into rest', async () => {
+    const { restBasis, restPending } = await import('../src/domain/today');
+    const d = setup(); d.profile!.routine = 'kwik';
+    const saved = dataSchema.parse(JSON.parse(JSON.stringify(d)));
+    for (let i = 0; i < 7; i++) {
+      const day = now + i * 86400000;
+      expect(todayFocus(saved, [], day)).toMatchObject({ focus: 'open', rest: false });
+      expect(restPending(saved, day)).toBe(true);
+    }
+    saved.restDecision = { day: dayKey(now), basis: restBasis(saved, now), rest: true };
+    expect(todayFocus(saved, [], now)).toMatchObject({ rest: true, auto: true });
   });
 });

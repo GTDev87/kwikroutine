@@ -1,5 +1,5 @@
 import { resting, soreLevel, soreLoad } from './soreness';
-import { defaultSchedule, weekdayAt } from './routine';
+import { scheduledPlan } from './routine';
 import { exerciseById } from "../data/exercises";
 import {
   AppData,
@@ -24,6 +24,18 @@ export function todayCheckIn(data: AppData, now = Date.now()) {
   return c && c.day === dayKey(now)
     ? c
     : { day: dayKey(now), sore: [], pain: false };
+}
+// A rest call holds for the day unless the check-in changes.
+export function restBasis(data: AppData, now = Date.now()) {
+  const c = todayCheckIn(data, now);
+  return JSON.stringify([dayKey(now), [...c.sore].sort().map(m => [m, c.soreLevels?.[m] ?? null]), c.pain]);
+}
+const scheduledOpen = (data: AppData, now: number) =>
+  data.workoutOverride?.day !== dayKey(now) && scheduledPlan(data, now)?.focus === 'open';
+// A scheduled open day waits on the app's train-or-rest call. Changing today skips it.
+export function restPending(data: AppData, now = Date.now()) {
+  const d = data.restDecision;
+  return scheduledOpen(data, now) && !(d && d.day === dayKey(now) && d.basis === restBasis(data, now));
 }
 export const muscleName = (m: Muscle) => (m === "core" ? "Core" : titleCase(m));
 export const listNames = (ms: Muscle[]) => {
@@ -56,17 +68,19 @@ export function todayFocus(
 // `sore` here means muscles resting today (medium or very sore).
 function focusFor(data: AppData, sore: Muscle[], now: number) {
   const override = data.workoutOverride?.day === dayKey(now) ? data.workoutOverride.plan : null;
-  const scheduled = data.profile?.routine === 'custom'
-    ? (data.profile.schedule ?? defaultSchedule())[weekdayAt(now)] : null;
+  const scheduled = scheduledPlan(data, now);
   const selected = override ?? scheduled;
   if (selected) {
+    const decided = data.restDecision;
+    if (selected.focus === 'open' && scheduledOpen(data, now) && decided?.rest && decided.day === dayKey(now) && decided.basis === restBasis(data, now))
+      return { focus: 'open' as Focus, targets: [] as Muscle[], why: 'Kwik Pick suggests resting today after your recent training. You can still train if you feel up to it.', rest: true, auto: true };
     if (selected.focus === 'rest') return { focus: 'full' as Focus, targets: [] as Muscle[], why: 'A day to rest. You can change today if your plans change.', rest: true };
     const intended = selected.focus === 'custom' ? selected.muscles : focusTargets[selected.focus];
     const skipped = intended.filter(m=>sore.includes(m));
     const soreNote = skipped.length ? `Your sore ${listNames(skipped)} get the day off.` : '';
-    // An open day keeps every rested muscle available and leaves the choice of moves to Laya.
+    // An open day keeps every rested muscle available and leaves the choice of moves to the model.
     const why = selected.focus === 'open'
-      ? `No set focus today. Laya picks each move from what you’ve recovered for.${soreNote ? ' ' + soreNote : ''}`
+      ? `No set focus today. Kwik Pick chooses each move from what you’ve recovered for.${soreNote ? ' ' + soreNote : ''}`
       : soreNote;
     return { focus: selected.focus, targets: intended.filter(m=>!sore.includes(m)), why, rest: false };
   }

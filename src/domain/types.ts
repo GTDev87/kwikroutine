@@ -154,13 +154,13 @@ export const equipmentLabels: Record<Equipment, string> = {
 export type Level = "beginner" | "intermediate" | "advanced";
 export type Pattern =
   "squat" | "hinge" | "push" | "pull" | "core" | "accessory";
-// "open" days have no preset focus: Laya chooses each move on the day.
+// "open" days have no preset focus: the model chooses each move, or rest, on the day.
 export type Focus = "full" | "upper" | "lower" | "open" | "custom";
 export const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 export type Weekday = (typeof WEEKDAYS)[number];
 export type DayPlan = { focus: 'full' | 'upper' | 'lower' | 'open' | 'rest' } | { focus: 'custom'; muscles: Muscle[] };
 export type WeeklySchedule = Record<Weekday, DayPlan>;
-export const routineLabels = { full: 'Full body', split: 'Splits', custom: 'Custom week' };
+export const routineLabels = { full: 'Full body', split: 'Splits', kwik: 'Kwik Pick', custom: 'Custom week' };
 export type Rejection =
   "busy" | "unavailable" | "sore" | "advanced" | "today" | "dislike" | "setup" | "floor" | "crowded" | "repetitive";
 export const INTENTS = ["auto", "easy", "challenge", "familiar", "surprise"] as const;
@@ -197,7 +197,7 @@ export interface Place {
 export interface Profile {
   weightUnit?: 'lb' | 'kg';
   level: Level;
-  routine: "full" | "split" | "custom";
+  routine: "full" | "split" | "kwik" | "custom";
   schedule?: WeeklySchedule;
   weeklyGoal: number;
 }
@@ -274,6 +274,8 @@ export interface AppData {
   billing: Billing | null;
   checkIn?: CheckIn | null;
   workoutOverride?: { day: string; plan: DayPlan } | null;
+  /** The app's train-or-rest call for a scheduled open day, tied to that day's check-in. */
+  restDecision?: { day: string; basis: string; rest: boolean } | null;
 }
 export const initialData: AppData = {
   version: 1,
@@ -302,7 +304,7 @@ export const focusLabels: Record<Focus, string> = {
   full: "Full body",
   upper: "Upper body",
   lower: "Legs & Core",
-  open: "Laya’s pick",
+  open: "Kwik Pick",
   custom: "My muscle groups",
 };
 export const focusTargets: Record<Exclude<Focus, "custom">, Muscle[]> = {

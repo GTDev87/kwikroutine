@@ -17,6 +17,8 @@ import {
 } from "../vendor/laya/tokenizer";
 import { LoadOptions } from "../domain/loadProgression";
 import { buildLoadInput } from './loadInput';
+import { RestOptions } from "../domain/restDay";
+import { buildRestInput } from './restInput';
 import { modelAssets } from "./modelAssets";
 import { loadNativeOrt } from "./nativeOrt";
 import type {
@@ -41,15 +43,15 @@ function diagnostic(stage: string, detail: unknown = null) {
 let runtime: Promise<Runtime> | null = null;
 let failedThisLaunch = false;
 let status = modelAssets
-  ? "Laya is bundled on this device"
-  : "Local exercise rules · Laya model not bundled";
+  ? "On-device model bundled"
+  : "Local exercise rules · on-device model not bundled";
 export const layaStatus = () => status;
 async function localAsset(name: string) {
   // Native build resources only. Never download weights or contact an inference service.
   const bundled = Platform.OS === 'android'
     ? new File(`asset:///laya/${name}`)
     : new File(Paths.bundle, name);
-  if (!bundled.exists) throw new Error(`Missing bundled Laya resource: ${name}. Rebuild the native app.`);
+  if (!bundled.exists) throw new Error(`Missing bundled model resource: ${name}. Rebuild the native app.`);
   if (Platform.OS !== 'android') return bundled.uri;
   const directory = new Directory(Paths.cache, `laya-${manifest.files['encoder.onnx'].sha256.slice(0, 12)}`);
   directory.create({ intermediates: true, idempotent: true });
@@ -118,6 +120,10 @@ export async function scoreLoadWithLaya(options: LoadOptions) {
   return scoreDecision(['hold', 'increase'], ({tok, config}) => buildLoadInput(tok, options,
     Math.min(Number(config.max_len ?? 512), 512), Number(config.head_max_len ?? 192)));
 }
+export async function scoreRestWithLaya(options: RestOptions) {
+  return scoreDecision(['train', 'rest'], ({tok, config}) => buildRestInput(tok, options,
+    Math.min(Number(config.max_len ?? 512), 512), Number(config.head_max_len ?? 192)));
+}
 // Serialize questions sharing the native sessions. A failed request cannot poison the queue.
 let inferenceQueue: Promise<unknown> = Promise.resolve();
 function scoreDecision(keys: string[], build: (rt: Runtime) => {ids: number[]; markers: number[]}) {
@@ -130,7 +136,7 @@ async function runDecision(keys: string[], build: (rt: Runtime) => {ids: number[
   runtime ??= load().catch((error) => {
     runtime = null;
     failedThisLaunch = true;
-    status = "Local exercise rules · Laya could not load";
+    status = "Local exercise rules · on-device model could not load";
     diagnostic("load-error", String(error));
     throw error;
   });
@@ -181,14 +187,14 @@ async function runDecision(keys: string[], build: (rt: Runtime) => {ids: number[
     )
       return null;
     const probabilities = softmax(logits.map((n) => n / scale));
-    status = "Laya · on-device inference";
+    status = "On-device model · active";
     diagnostic("success", { candidates: keys.length });
     return Object.fromEntries(
       keys.map((key, i) => [key, probabilities[i]]),
     );
   } catch (error) {
     failedThisLaunch = true;
-    status = "Local exercise rules · Laya inference unavailable";
+    status = "Local exercise rules · on-device model unavailable";
     diagnostic("inference-error", String(error));
     throw error;
   } finally {

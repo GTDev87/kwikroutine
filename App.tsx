@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Animated,
   AppState,
+  Easing,
   BackHandler,
   Platform,
   Pressable,
@@ -34,6 +36,8 @@ import { listenBilling, refreshBilling } from "./src/services/billing";
 import { mergeBilling } from "./src/domain/engine";
 import { backTarget } from "./src/navigation";
 import { TabIcon, TabId } from "./src/components/TabIcon";
+import { LinearGradient } from "expo-linear-gradient";
+import { ND, Squish, useReducedMotion } from "./src/components/motion";
 const tabs: { id: TabId; title: string }[] = [
   { id: "today", title: "Today" },
   { id: "history", title: "History" },
@@ -105,38 +109,105 @@ function Shell() {
         <Onboarding />
       ) : (
         <>
-          <View style={{ flex: 1 }}>
+          <ScreenIn key={pathname} style={{ flex: 1 }}>
             <Slot />
-          </View>
-          {isTab && (
-            <View style={styles.tabs} accessibilityRole="tablist">
-              {tabs.map((tab) => (
-                <Pressable
-                  key={tab.id}
-                  accessibilityRole="tab"
-                  accessibilityLabel={tab.title}
-                  accessibilityState={{ selected: tab.id === route }}
-                  onPress={() => setRoute(tab.id)}
-                  style={styles.tab}
-                >
-                  <TabIcon id={tab.id} on={route === tab.id} />
-                  <T
-                    style={{
-                      fontSize: 12,
-                      lineHeight: 15,
-                      fontFamily: fonts.semibold,
-                      color: route === tab.id ? C.ink : C.muted,
-                    }}
-                  >
-                    {tab.title}
-                  </T>
-                </Pressable>
-              ))}
-            </View>
-          )}
+          </ScreenIn>
+          {isTab && <TabBar route={route} onSelect={setRoute} />}
         </>
       )}
     </>
+  );
+}
+// Each screen slides up and fades in when the route changes.
+function ScreenIn({ children, style }: { children: React.ReactNode; style?: object }) {
+  const v = useRef(new Animated.Value(0)).current;
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    Animated.timing(v, {
+      toValue: 1,
+      duration: reduce ? 1 : 380,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: ND,
+    }).start();
+  }, [reduce]);
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          opacity: v,
+          transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [14, 0] }) }],
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+// Floating pill tab bar; a lime slab glides under the active tab.
+function TabBar({ route, onSelect }: { route: string; onSelect: (id: string) => void }) {
+  const [width, setWidth] = useState(0);
+  const index = Math.max(0, tabs.findIndex((t) => t.id === route));
+  const x = useRef(new Animated.Value(index)).current;
+  useEffect(() => {
+    Animated.spring(x, { toValue: index, friction: 7, tension: 80, useNativeDriver: ND }).start();
+  }, [index, x]);
+  const slot = width / tabs.length;
+  return (
+    <View style={styles.tabWrap}>
+      <View
+        style={styles.tabs}
+        accessibilityRole="tablist"
+        onLayout={(e) => setWidth(e.nativeEvent.layout.width - 12)}
+      >
+        {width > 0 && (
+          <Animated.View
+            style={[
+              styles.indicator,
+              {
+                width: slot,
+                transform: [
+                  { translateX: x.interpolate({ inputRange: [0, 1], outputRange: [0, slot] }) },
+                ],
+              },
+            ]}
+          >
+            <LinearGradient
+              colors={["#D6FF63", C.accent, C.accentDeep]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[StyleSheet.absoluteFill, { borderRadius: 20 }]}
+            />
+          </Animated.View>
+        )}
+        {tabs.map((tab) => {
+          const on = tab.id === route;
+          return (
+            <Squish
+              key={tab.id}
+              accessibilityRole="tab"
+              accessibilityLabel={tab.title}
+              accessibilityState={{ selected: on }}
+              onPress={() => onSelect(tab.id)}
+              scaleTo={0.9}
+              style={styles.tab}
+            >
+              <TabIcon id={tab.id} on={on} size={24} color={on ? C.onAccent : undefined} />
+              <T
+                style={{
+                  fontSize: 11,
+                  lineHeight: 14,
+                  fontFamily: on ? fonts.black : fonts.semibold,
+                  color: on ? C.onAccent : C.muted,
+                }}
+              >
+                {tab.title}
+              </T>
+            </Squish>
+          );
+        })}
+      </View>
+    </View>
   );
 }
 export default function App() {
@@ -174,13 +245,28 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: C.bg,
   },
+  tabWrap: {
+    paddingHorizontal: 14,
+    paddingTop: 6,
+    paddingBottom: 8,
+    backgroundColor: C.bg,
+  },
   tabs: {
     flexDirection: "row",
-    paddingTop: 10,
-    paddingBottom: 8,
-    borderTopWidth: 1,
-    borderTopColor: C.line,
-    backgroundColor: C.bar,
+    padding: 6,
+    borderRadius: 26,
+    borderWidth: 1,
+    borderColor: C.line,
+    backgroundColor: C.surface,
+    boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
   },
-  tab: { flex: 1, alignItems: "center", gap: 5 },
+  indicator: {
+    position: "absolute",
+    top: 6,
+    bottom: 6,
+    left: 6,
+    borderRadius: 20,
+    boxShadow: "0 6px 20px rgba(192,244,71,0.35)",
+  },
+  tab: { flex: 1, alignItems: "center", gap: 3, paddingVertical: 8 },
 });

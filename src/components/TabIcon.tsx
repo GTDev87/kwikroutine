@@ -5,9 +5,9 @@ import { C, T, fonts } from "./ui";
 
 export type TabId = "today" | "history" | "profile";
 // Line icons in the same stroke style as Icon; the active tab turns lime with a soft fill.
-export function TabIcon({ id, on, size = 26 }: { id: TabId; on: boolean; size?: number }) {
-  const stroke = on ? C.accent : C.muted;
-  const fill = on ? C.accentSoft : "none";
+export function TabIcon({ id, on, size = 26, color }: { id: TabId; on: boolean; size?: number; color?: string }) {
+  const stroke = color ?? (on ? C.accent : C.muted);
+  const fill = on ? (color ? "rgba(0,0,0,0.1)" : C.accentSoft) : "none";
   const common = {
     stroke,
     strokeWidth: 1.8,

@@ -1,6 +1,7 @@
 import { escalate } from "../domain/soreness";
 import { displayWeight, toKg, weightUnit } from "../domain/weightUnits";
 import { ExercisePicture, picturesFor } from "../components/ExercisePicture";
+import { HoldTimer } from "../components/HoldTimer";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -16,18 +17,25 @@ import {
   C,
   Chip,
   Heading,
+  Icon,
   IconButton,
   Label,
   LevelBars,
   OptionCard,
   R,
+  Segments,
   T,
   Tag,
+  Tape,
   TextLink,
+  focusTheme,
   fonts,
   s,
   sizes,
 } from "../components/ui";
+import { Chroma, Float, Glow, Pop, Rise, Squish, useLoop } from "../components/motion";
+import { Poster } from "../components/Poster";
+import { Ring } from "../components/Ring";
 import { useStore } from "../state/store";
 import { exerciseById } from "../data/exercises";
 import {
@@ -57,8 +65,10 @@ import {
   whyThis,
 } from "../domain/today";
 
-const mmss = (s: number) =>
-  `${Math.floor(Math.max(0, s) / 60)}:${String(Math.ceil(Math.max(0, s)) % 60).padStart(2, "0")}`;
+const mmss = (s: number) => {
+  const whole = Math.ceil(Math.max(0, s));
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+};
 const levelBars = { beginner: 1, intermediate: 2, advanced: 3 } as const;
 function reasonsFor(
   ex: Exercise,
@@ -101,25 +111,38 @@ function Header({
     <View style={[s.between, { paddingHorizontal: 16, height: 48 }]}>
       <IconButton name="close" label="Finish for today" onPress={onClose} />
       <View style={{ alignItems: "center", flex: 1 }}>
-        <T style={{ fontSize: 15, fontFamily: fonts.semibold }}>{title}</T>
+        <T style={{ fontSize: 15, fontFamily: fonts.bold }}>{title}</T>
         {!!subtitle && (
           <T style={{ fontSize: 12, lineHeight: 16, color: C.muted }}>
             {subtitle}
           </T>
         )}
       </View>
-      <T
-        accessibilityLabel={`${Math.ceil(remaining / 60)} minutes left`}
+      <View
         style={{
-          width: 40,
-          textAlign: "right",
-          fontFamily: fonts.mono,
-          fontSize: 13,
-          color: C.muted,
+          minWidth: 58,
+          paddingHorizontal: 9,
+          paddingVertical: 5,
+          borderRadius: 999,
+          borderWidth: 1,
+          borderColor: remaining < 120 ? C.coral : C.line,
+          backgroundColor: C.surface,
+          alignItems: "center",
         }}
       >
-        {mmss(remaining)}
-      </T>
+        <T
+          accessibilityLabel={`${Math.ceil(remaining / 60)} minutes left`}
+          style={{
+            fontFamily: fonts.mono,
+            fontSize: 13,
+            lineHeight: 16,
+            color: remaining < 120 ? C.coral : C.ink,
+            fontVariant: ["tabular-nums"],
+          }}
+        >
+          {mmss(remaining)}
+        </T>
+      </View>
     </View>
   );
 }
@@ -138,7 +161,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
   const [reps, setReps] = useState("10"),
     [weight, setWeight] = useState("0"),
     [effort, setEffort] = useState<SetLog["effort"]>("right"),
-    [holdUntil, setHoldUntil] = useState<number | null>(null);
+    [held, setHeld] = useState<number | null>(null);
   const ex = session?.current ? exerciseById[session.current.exerciseId] : null;
   const unit = weightUnit(data.profile);
   const recordedLoad = session?.current?.sets.at(-1)?.weight ?? session?.current?.load?.suggested ?? 0;
@@ -162,7 +185,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
   useEffect(() => {
     if (ex) {
       setReps(String(ex.seconds ?? ex.reps));
-      setHoldUntil(null);
+      setHeld(null);
       setEffort("right");
       setStarted(false);
       x.setValue(0);
@@ -255,7 +278,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
     Number(weight) >= 0 &&
     toKg(Number(weight), unit) <= 1000;
   const submitSet = () => {
-    const parsedReps = Number(reps),
+    const parsedReps = held ?? Number(reps),
       parsedWeight = toKg(Number(weight), unit);
     if (!valid) return;
     update((d) =>
@@ -266,24 +289,29 @@ export function Workout({ go }: { go: (route: string) => void }) {
         at: Date.now(),
       }),
     );
-    setHoldUntil(null);
+    setHeld(null);
     setEffort("right");
     void Haptics.notificationAsync(
       Haptics.NotificationFeedbackType.Success,
     ).catch(() => {});
   };
   const close = () => setEnd(true);
+  const theme = focusTheme[session.focus];
   if (end)
     return (
       <View style={{ flex: 1, padding: 24, justifyContent: "center", gap: 16 }}>
-        <Label>{focusLabels[session.focus]}</Label>
-        <Heading size={sizes.title}>Call it a day?</Heading>
-        <T style={[s.muted, { fontSize: 16, lineHeight: 23 }]}>
-          We’ll save every set you completed. A shorter session still counts.
-        </T>
+        <Rise style={{ gap: 14 }}>
+          <Tape color={theme.tint}>{focusLabels[session.focus]}</Tape>
+          <Chroma size={44} echoes={[C.coral, C.violet]}>Call it a day?</Chroma>
+          <T style={[s.muted, { fontSize: 16, lineHeight: 23 }]}>
+            We’ll save every set you completed. A shorter session still counts.
+          </T>
+        </Rise>
         <View style={{ height: 8 }} />
-        <Button title="Finish & save workout" onPress={finish} />
-        <Button title="Keep going" secondary onPress={() => setEnd(false)} />
+        <Rise delay={120} style={{ gap: 12 }}>
+          <Button title="Finish & save workout" onPress={finish} />
+          <Button title="Keep going" secondary onPress={() => setEnd(false)} />
+        </Rise>
       </View>
     );
   if (!session.warmupDone)
@@ -296,20 +324,28 @@ export function Workout({ go }: { go: (route: string) => void }) {
           remaining={remaining}
         />
         <ScrollView contentContainerStyle={{ padding: 24, gap: 18 }}>
-          <Heading size={30}>Two minutes to warm up.</Heading>
-          <T style={s.muted}>
-            Easy pace. Skip anything that doesn’t feel right.
-          </T>
-          <Steps
-            items={[
-              "Walk or march gently in place.",
-              "Roll your shoulders and circle your arms.",
-              "A few easy hip hinges and knee bends.",
-            ]}
-          />
+          <Breathe color={theme.tint} />
+          <Rise delay={80}>
+            <Chroma size={40} echoes={[theme.tint, C.violet]}>Two minutes to warm up.</Chroma>
+          </Rise>
+          <Rise delay={160}>
+            <T style={[s.muted, { fontSize: 16 }]}>
+              Easy pace. Skip anything that doesn’t feel right.
+            </T>
+          </Rise>
+          <Rise delay={240}>
+            <Steps
+              items={[
+                "Walk or march gently in place.",
+                "Roll your shoulders and circle your arms.",
+                "A few easy hip hinges and knee bends.",
+              ]}
+            />
+          </Rise>
         </ScrollView>
         <View style={{ padding: 24, paddingTop: 12 }}>
           <Button
+            shine
             title="I’m warmed up"
             busy={loading}
             onPress={() => {
@@ -344,41 +380,31 @@ export function Workout({ go }: { go: (route: string) => void }) {
           subtitle={`${session.minutes} min · move ${moveNumber} of about ${about}`}
           remaining={remaining}
         />
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 5,
-            paddingHorizontal: 24,
-            paddingTop: 8,
-          }}
-        >
-          {Array.from({ length: about }, (_, i) => (
+        <View style={{ flexDirection: "row", paddingHorizontal: 26, paddingTop: 8 }}>
+          <Segments total={about} done={moveNumber} height={6} />
+        </View>
+        <View style={{ flex: 1, marginHorizontal: 20, marginTop: 18 }}>
+          {[
+            { inset: 22, drop: -18, turn: "3deg", color: C.violet, o: 0.45 },
+            { inset: 10, drop: -9, turn: "-2deg", color: theme.tint, o: 0.7 },
+          ].map((b, i) => (
             <View
               key={i}
               style={{
-                flex: 1,
-                height: 4,
-                borderRadius: 2,
-                backgroundColor: i < moveNumber ? C.accent : C.line,
+                position: "absolute",
+                left: b.inset,
+                right: b.inset,
+                top: 14,
+                bottom: b.drop,
+                borderRadius: R.sheet,
+                backgroundColor: C.surface,
+                borderWidth: 1.5,
+                borderColor: b.color,
+                opacity: b.o,
+                transform: [{ rotate: b.turn }],
               }}
             />
           ))}
-        </View>
-        <View style={{ flex: 1, marginHorizontal: 20, marginTop: 18 }}>
-          <View
-            style={{
-              position: "absolute",
-              left: 14,
-              right: 14,
-              top: 14,
-              bottom: -10,
-              borderRadius: R.sheet,
-              backgroundColor: C.surface,
-              borderWidth: 1,
-              borderColor: C.line2,
-              opacity: 0.7,
-            }}
-          />
           <Animated.View
             {...pan.panHandlers}
             accessibilityHint="Swipe left to skip, right to start"
@@ -386,10 +412,25 @@ export function Workout({ go }: { go: (route: string) => void }) {
               flex: 1,
               borderRadius: R.sheet,
               backgroundColor: C.surface,
+              borderWidth: 1,
+              borderColor: C.line,
               overflow: "hidden",
+              boxShadow: "0 24px 48px rgba(0,0,0,0.55)",
               transform: [{ translateX: x }, { rotate }],
             }}
           >
+            <Stamp
+              label="GO"
+              color={C.accent}
+              side="left"
+              opacity={x.interpolate({ inputRange: [0, 90], outputRange: [0, 1], extrapolate: "clamp" })}
+            />
+            <Stamp
+              label="SKIP"
+              color={C.coral}
+              side="right"
+              opacity={x.interpolate({ inputRange: [-90, 0], outputRange: [1, 0], extrapolate: "clamp" })}
+            />
             {hasPicture && <View style={{ height: 200 }}>
               <ExercisePicture key={ex.id} exercise={ex} height={200} radius={0} />
               {isNewFor(data, ex.id) && (
@@ -401,15 +442,18 @@ export function Workout({ go }: { go: (route: string) => void }) {
             <ScrollView
               contentContainerStyle={{ padding: 20, paddingTop: 16, gap: 10 }}
             >
-              {!hasPicture && isNewFor(data, ex.id) && <View style={s.row}><Tag label="New for you" accent /></View>}
+              {!hasPicture && (
+                <View style={{ height: 8, marginHorizontal: -20, marginTop: -16, marginBottom: 8, backgroundColor: theme.tint }} />
+              )}
+              {!hasPicture && isNewFor(data, ex.id) && <View style={s.row}><Tag label="New for you" solid /></View>}
               <View style={[s.wrap, { gap: 6 }]}>
                 {[...ex.primary, ...ex.secondary].slice(0, 4).map((m) => (
                   <Tag key={m} label={muscleName(m)} small />
                 ))}
               </View>
-              <Heading size={sizes.card}>{ex.name}</Heading>
+              <Heading size={30} style={{ letterSpacing: -1.2 }}>{ex.name}</Heading>
               <View style={s.row}>
-                <LevelBars level={levelBars[ex.level]} size={12} />
+                <LevelBars level={levelBars[ex.level]} size={12} color={theme.tint} />
                 <T style={{ fontSize: 13, color: C.muted, marginLeft: -4 }}>
                   {titleCase(ex.level)} ·{" "}
                   {ex.equipment.length
@@ -418,10 +462,11 @@ export function Workout({ go }: { go: (route: string) => void }) {
                 </T>
               </View>
               <View style={{ flexDirection: "row", gap: 8, marginTop: 6 }}>
-                <Mini value={cur.plannedSets} label="sets" />
+                <Mini value={cur.plannedSets} label="sets" color={theme.tint} />
                 <Mini
                   value={ex.seconds ?? ex.reps}
                   label={`${ex.seconds ? "sec" : "reps"}${ex.unilateral ? " each side" : ""}`}
+                  color={C.violet}
                 />
                 <Mini
                   value={Math.max(
@@ -429,6 +474,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
                     Math.round(estimateSeconds(ex, cur.plannedSets) / 60),
                   )}
                   label="min"
+                  color={C.cyan}
                 />
               </View>
               {!hasPicture && <View style={{ gap: 12, marginTop: 8 }}>
@@ -454,22 +500,13 @@ export function Workout({ go }: { go: (route: string) => void }) {
             </ScrollView>
           </Animated.View>
         </View>
-        <View style={{ padding: 24, paddingTop: 26, gap: 14 }}>
-          <T style={{ fontSize: 13, color: C.muted, textAlign: "center" }}>
-            Swipe left to skip · right to start
-          </T>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <Button
-              title="Skip"
-              secondary
-              onPress={actions.current.skip}
-              style={{ flex: 1 }}
-            />
-            <Button
-              title="Start"
-              onPress={() => setStarted(true)}
-              style={{ flex: 1.4 }}
-            />
+        <View style={{ paddingHorizontal: 24, paddingTop: 30, paddingBottom: 20, gap: 12 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 28 }}>
+            <RoundAction label="Skip" icon="close" color={C.coral} onPress={actions.current.skip} />
+            <T style={{ fontSize: 12, lineHeight: 16, color: C.faint, textAlign: "center", width: 96 }}>
+              Swipe left to skip · right to start
+            </T>
+            <RoundAction label="Start" icon="arrow" color={C.accent} filled onPress={() => setStarted(true)} />
           </View>
         </View>
         {skip && (
@@ -487,11 +524,14 @@ export function Workout({ go }: { go: (route: string) => void }) {
               onPress={undoSkip}
               style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)" }}
             />
-            <View
+            <Rise
+              from={260}
               style={{
                 backgroundColor: C.surface,
                 borderTopLeftRadius: R.sheet,
                 borderTopRightRadius: R.sheet,
+                borderTopWidth: 3,
+                borderColor: C.coral,
                 padding: 20,
                 paddingTop: 10,
                 maxHeight: "85%",
@@ -510,7 +550,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
                 contentContainerStyle={{ gap: 10, paddingTop: 18 }}
                 style={{ flexShrink: 1 }}
               >
-                <Heading size={24}>Why skip this one?</Heading>
+                <Chroma size={30} echoes={[C.coral]}>Why skip this one?</Chroma>
                 <T style={[s.muted, { fontSize: 14, marginBottom: 8 }]}>
                   Your answer shapes what comes next.
                 </T>
@@ -577,7 +617,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
                   style={{ flex: 1.4 }}
                 />
               </View>
-            </View>
+            </Rise>
           </View>
         )}
       </View>
@@ -613,8 +653,8 @@ export function Workout({ go }: { go: (route: string) => void }) {
             ]}
           >
             <View style={{ flex: 1 }}>
-              <Heading size={sizes.card}>{ex.name}</Heading>
-              <T style={{ marginTop: 4, fontSize: 14, color: C.muted }}>
+              <Heading size={sizes.card} style={{ letterSpacing: -1.1 }}>{ex.name}</Heading>
+              <T style={{ marginTop: 4, fontSize: 14, color: theme.tint, fontFamily: fonts.semibold }}>
                 {ex.primary.map(muscleName).join(" · ")}
               </T>
             </View>
@@ -623,20 +663,21 @@ export function Workout({ go }: { go: (route: string) => void }) {
                 Set {Math.min(cur.sets.length + 1, cur.plannedSets)} of{" "}
                 {cur.plannedSets}
               </T>
-              <View style={{ flexDirection: "row", gap: 4, marginTop: 6 }}>
+              <View style={{ flexDirection: "row", gap: 4, marginTop: 6, transform: [{ skewX: "-20deg" }] }}>
                 {Array.from({ length: cur.plannedSets }, (_, i) => (
                   <View
                     key={i}
                     style={{
                       width: 22,
-                      height: 5,
-                      borderRadius: 3,
+                      height: 7,
+                      borderRadius: 1.5,
                       backgroundColor:
                         i < cur.sets.length
                           ? C.ink
                           : i === cur.sets.length
-                            ? C.accent
+                            ? theme.tint
                             : C.line,
+                      ...(i === cur.sets.length ? { boxShadow: `0 0 10px ${theme.tint}` } : {}),
                     }}
                   />
                 ))}
@@ -644,36 +685,64 @@ export function Workout({ go }: { go: (route: string) => void }) {
             </View>
           </View>
           {rest > 0 ? (
-            <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 4 }}>
-              <Label color={C.accent}>Rest</Label>
-              <T
-                style={{
-                  fontSize: 88,
-                  lineHeight: 92,
-                  fontFamily: fonts.bold,
-                  letterSpacing: -4,
-                }}
-              >
-                {mmss(rest)}
-              </T>
-              <T style={{ fontSize: 17, color: C.muted }}>
+            <Pop style={{ alignItems: "center", paddingTop: 22, gap: 14 }}>
+              <View style={{ position: "absolute", top: -30 }}>
+                <Glow color={theme.tint} size={320} opacity={0.22} />
+              </View>
+              <Ring until={session.restUntil ?? 0} total={ex.rest} colors={[theme.tint, C.cyan]}>
+                <Tape color={theme.tint} style={{ alignSelf: "center" }}>Rest</Tape>
+                <T
+                  style={{
+                    fontSize: 68,
+                    lineHeight: 76,
+                    fontFamily: fonts.black,
+                    letterSpacing: -3,
+                    fontVariant: ["tabular-nums"],
+                    marginTop: 4,
+                  }}
+                >
+                  {mmss(rest)}
+                </T>
+              </Ring>
+              <T style={{ fontSize: 17, color: C.muted, fontFamily: fonts.medium }}>
                 Next up: set {cur.sets.length + 1} of {cur.plannedSets}
               </T>
+            </Pop>
+          ) : ex.seconds ? (
+            <View style={{ paddingHorizontal: 20, paddingTop: 12 }}>
+              <HoldTimer
+                key={`${ex.id}-${cur.sets.length}`}
+                seconds={Number(reps) || ex.seconds}
+                unilateral={ex.unilateral}
+                onChangeSeconds={(n) => setReps(String(n))}
+                onHeld={setHeld}
+              />
             </View>
           ) : (
             <View
               style={{
-                paddingHorizontal: 24,
-                paddingTop: 12,
+                marginHorizontal: 20,
+                marginTop: 14,
+                paddingVertical: 10,
+                paddingHorizontal: 14,
+                borderRadius: R.card,
+                backgroundColor: C.surface,
+                borderWidth: 1,
+                borderColor: C.line2,
                 flexDirection: "row",
-                alignItems: "baseline",
+                alignItems: "center",
                 gap: 10,
+                overflow: "hidden",
               }}
             >
+              <Nudge
+                label="One fewer rep"
+                sign="−"
+                onPress={() => setReps(String(Math.max(1, (Number(reps) || 1) - 1)))}
+              />
+              <View style={{ flex: 1, flexDirection: "row", alignItems: "baseline", justifyContent: "center", gap: 8 }}>
               <TextInput
-                accessibilityLabel={
-                  ex.seconds ? "Seconds completed" : "Repetitions completed"
-                }
+                accessibilityLabel="Repetitions completed"
                 keyboardType="number-pad"
                 value={reps}
                 onChangeText={setReps}
@@ -681,18 +750,24 @@ export function Workout({ go }: { go: (route: string) => void }) {
                 selectionColor={C.accent}
                 style={{
                   fontSize: 88,
-                  fontFamily: fonts.bold,
                   letterSpacing: -4,
                   color: C.ink,
                   padding: 0,
+                  fontFamily: fonts.black,
+                  textAlign: "center",
                   // Size to the digits so the unit sits right beside the number.
-                  width: Math.max(1, reps.length) * 42 + 6,
+                  width: Math.max(1, reps.length) * 46 + 6,
                 }}
               />
-              <T style={{ fontSize: 17, color: C.muted }}>
-                {ex.seconds ? "seconds" : "reps"}
-                {ex.unilateral ? " each side" : ""}
+              <T style={{ fontSize: 16, color: C.muted, fontFamily: fonts.semibold }}>
+                {ex.unilateral ? "reps\neach side" : "reps"}
               </T>
+              </View>
+              <Nudge
+                label="One more rep"
+                sign="+"
+                onPress={() => setReps(String(Math.min(300, (Number(reps) || 0) + 1)))}
+              />
             </View>
           )}
           {weighted && rest === 0 && (
@@ -723,7 +798,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
               <View style={{gap: 4}}>
                 <T style={{color: C.muted, fontSize: 13, lineHeight: 19}}>
                   {cur.load.source === 'laya'
-                    ? `Laya suggests ${displayWeight(cur.load.suggested, unit)} ${unit} · last time ${displayWeight(cur.load.previous, unit)} ${unit}. Two easy workouts support a small increase.`
+                    ? `Suggested: ${displayWeight(cur.load.suggested, unit)} ${unit} · last time ${displayWeight(cur.load.previous, unit)} ${unit}. Two easy workouts support a small increase.`
                     : `Last time here: ${displayWeight(cur.load.previous, unit)} ${unit}. Adjust to what feels right today.`}
                 </T>
                 {cur.load.source === 'laya' && <>
@@ -757,42 +832,36 @@ export function Workout({ go }: { go: (route: string) => void }) {
             />
           ) : (
             <>
-              {!!ex.seconds && (
-                <Button
-                  secondary
-                  title={
-                    holdUntil && holdUntil > now
-                      ? `Timer · ${mmss((holdUntil - now) / 1000)}`
-                      : "Start set timer"
-                  }
-                  onPress={() =>
-                    setHoldUntil(Date.now() + Number(reps || ex.seconds) * 1000)
-                  }
-                  disabled={!!holdUntil && holdUntil > now}
-                />
-              )}
               <T style={{ fontSize: 14, color: C.muted, textAlign: "center" }}>
                 How did that set feel?
               </T>
               <View style={{ flexDirection: "row", gap: 8 }}>
-                {(["easy", "right", "hard"] as const).map((e) => (
-                  <Pressable
+                {(["easy", "right", "hard"] as const).map((e) => {
+                  const tone = { easy: C.cyan, right: C.accent, hard: C.coral }[e];
+                  const on = effort === e;
+                  return (
+                  <Squish
                     key={e}
                     accessibilityRole="radio"
-                    accessibilityState={{ checked: effort === e }}
+                    accessibilityState={{ checked: on }}
                     onPress={() => setEffort(e)}
+                    scaleTo={0.92}
                     style={{
                       flex: 1,
-                      height: 44,
+                      height: 48,
                       borderRadius: R.chip,
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: effort === e ? C.accentSoft : C.surface,
+                      flexDirection: "row",
+                      gap: 7,
+                      backgroundColor: on ? tone : C.surface,
                       borderWidth: 1.5,
-                      borderColor: effort === e ? C.accent : C.line,
+                      borderColor: on ? tone : C.line,
+                      ...(on ? { boxShadow: `0 6px 18px ${tone}55` } : {}),
                     }}
                   >
-                    <T style={{ fontSize: 14, fontFamily: fonts.semibold }}>
+                    {!on && <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: tone }} />}
+                    <T style={{ fontSize: 14, fontFamily: on ? fonts.black : fonts.semibold, color: on ? C.onAccent : C.ink }}>
                       {
                         {
                           easy: "Too easy",
@@ -801,8 +870,9 @@ export function Workout({ go }: { go: (route: string) => void }) {
                         }[e]
                       }
                     </T>
-                  </Pressable>
-                ))}
+                  </Squish>
+                  );
+                })}
               </View>
               <Button
                 title={lastSet ? "Finish exercise" : "Set done"}
@@ -827,16 +897,21 @@ export function Workout({ go }: { go: (route: string) => void }) {
         remaining={remaining}
       />
       <View style={{ flex: 1, padding: 24, justifyContent: "center", gap: 14 }}>
-        <Label color={C.accent}>
-          {stop ? "That’s a wrap" : done ? `Move ${done} done` : "Ready"}
-        </Label>
-        <Heading size={sizes.title}>
-          {stop
-            ? "Good place to stop."
-            : done
-              ? "Nice. Next one’s a surprise."
-              : "Your first move is a surprise."}
-        </Heading>
+        <Mystery theme={theme} stop={stop} done={done} />
+        <Rise delay={120}>
+          <Tape color={stop ? C.coral : theme.tint}>
+            {stop ? "That’s a wrap" : done ? `Move ${done} done` : "Ready"}
+          </Tape>
+        </Rise>
+        <Rise delay={180}>
+          <Chroma size={38} echoes={[stop ? C.coral : theme.tint, C.violet]}>
+            {stop
+              ? "Good place to stop."
+              : done
+                ? "Nice. Next one’s a surprise."
+                : "Your first move is a surprise."}
+          </Chroma>
+        </Rise>
         <T style={[s.muted, { fontSize: 16, lineHeight: 23 }]}>
           {empty
             ? "Nothing else fits your remaining time and preferences. Your sets are ready to save."
@@ -848,6 +923,8 @@ export function Workout({ go }: { go: (route: string) => void }) {
       <View style={{ padding: 24, gap: 12 }}>
         {!stop && (
           <Button
+            shine
+            icon="spark"
             title="Reveal next exercise"
             busy={loading}
             onPress={() => void next()}
@@ -862,7 +939,7 @@ export function Workout({ go }: { go: (route: string) => void }) {
     </View>
   );
 }
-function Mini({ value, label }: { value: number; label: string }) {
+function Mini({ value, label, color = C.accent }: { value: number; label: string; color?: string }) {
   return (
     <View
       style={{
@@ -871,12 +948,176 @@ function Mini({ value, label }: { value: number; label: string }) {
         paddingHorizontal: 12,
         borderRadius: R.chip,
         backgroundColor: C.bg,
+        borderBottomWidth: 3,
+        borderBottomColor: color,
       }}
     >
-      <T style={{ fontSize: 22, lineHeight: 27, fontFamily: fonts.bold }}>
+      <T style={{ fontSize: 26, lineHeight: 30, fontFamily: fonts.black, letterSpacing: -0.8 }}>
         {value}
       </T>
-      <T style={{ fontSize: 12, lineHeight: 16, color: C.muted }}>{label}</T>
+      <T style={{ fontSize: 12, lineHeight: 16, color: C.muted, fontFamily: fonts.medium }}>{label}</T>
+    </View>
+  );
+}
+// Rubber-stamp verdict that fades in on the card as it's dragged.
+function Stamp({
+  label,
+  color,
+  side,
+  opacity,
+}: {
+  label: string;
+  color: string;
+  side: "left" | "right";
+  opacity: Animated.AnimatedInterpolation<number>;
+}) {
+  return (
+    <Animated.View
+      style={{
+        position: "absolute",
+        top: 28,
+        [side]: 22,
+        zIndex: 5,
+        opacity,
+        pointerEvents: "none",
+        paddingHorizontal: 14,
+        paddingVertical: 4,
+        borderWidth: 4,
+        borderColor: color,
+        borderRadius: 10,
+        backgroundColor: "rgba(10,10,11,0.75)",
+        transform: [{ rotate: side === "left" ? "-14deg" : "14deg" }],
+      }}
+    >
+      <T style={{ color, fontFamily: fonts.black, fontSize: 34, lineHeight: 40, letterSpacing: 2 }}>{label}</T>
+    </Animated.View>
+  );
+}
+// Big round skip/start buttons under the card.
+function RoundAction({
+  label,
+  icon,
+  color,
+  filled = false,
+  onPress,
+}: {
+  label: string;
+  icon: "close" | "arrow";
+  color: string;
+  filled?: boolean;
+  onPress: () => void;
+}) {
+  const size = filled ? 76 : 64;
+  return (
+    <View style={{ alignItems: "center", gap: 6 }}>
+      <Squish
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        onPress={onPress}
+        scaleTo={0.88}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: filled ? color : C.surface,
+          borderWidth: filled ? 0 : 2,
+          borderColor: color,
+          boxShadow: `0 10px 28px ${color}${filled ? "66" : "33"}`,
+        }}
+      >
+        <Icon name={icon} size={filled ? 32 : 26} color={filled ? C.onAccent : color} />
+      </Squish>
+      <T style={{ fontSize: 13, fontFamily: fonts.bold, color: filled ? C.ink : C.muted }}>{label}</T>
+    </View>
+  );
+}
+// Round −/+ for adjusting reps without the keyboard.
+function Nudge({ label, sign, onPress }: { label: string; sign: string; onPress: () => void }) {
+  return (
+    <Squish
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      scaleTo={0.85}
+      hitSlop={6}
+      style={{
+        width: 46,
+        height: 46,
+        borderRadius: 23,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: C.surface2,
+      }}
+    >
+      <T style={{ fontSize: 26, lineHeight: 30, fontFamily: fonts.bold }}>{sign}</T>
+    </Squish>
+  );
+}
+// Expanding rings that pace an easy breath during the warm-up.
+function Breathe({ color }: { color: string }) {
+  const v = useLoop(3200, { pingPong: true });
+  return (
+    <View style={{ height: 150, alignItems: "center", justifyContent: "center" }}>
+      {[1, 0.72, 0.46].map((k, i) => (
+        <Animated.View
+          key={i}
+          style={{
+            position: "absolute",
+            width: 150 * k,
+            height: 150 * k,
+            borderRadius: 75 * k,
+            borderWidth: 2,
+            borderColor: color,
+            opacity: 0.25 + i * 0.25,
+            transform: [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [0.8 + i * 0.05, 1.05] }) }],
+          }}
+        />
+      ))}
+      <View style={{ width: 54, height: 54, borderRadius: 27, backgroundColor: color, alignItems: "center", justifyContent: "center", boxShadow: `0 0 30px ${color}` }}>
+        <T style={{ color: C.onAccent, fontFamily: fonts.black, fontSize: 15 }}>2:00</T>
+      </View>
+    </View>
+  );
+}
+// A face-down card with a big question mark, bobbing in place: the next move is a secret.
+function Mystery({ theme, stop, done }: { theme: (typeof focusTheme)["full"]; stop: boolean; done: number }) {
+  return (
+    <View style={{ alignItems: "center", marginBottom: 18, height: 230, justifyContent: "center" }}>
+      <View style={{ position: "absolute" }}>
+        <Glow color={stop ? C.coral : theme.tint} size={340} opacity={0.3} />
+      </View>
+      <Pop>
+        <Float distance={10} rotate={3} duration={2400}>
+          <View style={{ transform: [{ rotate: "-6deg" }] }}>
+            <View
+              style={{
+                position: "absolute",
+                width: 150,
+                height: 206,
+                borderRadius: 22,
+                backgroundColor: C.surface2,
+                borderWidth: 1.5,
+                borderColor: C.violet,
+                transform: [{ rotate: "12deg" }, { translateX: 18 }],
+              }}
+            />
+            <Poster theme={stop ? focusTheme.lower : theme} style={{ width: 150, height: 206, padding: 0, borderRadius: 22, alignItems: "center", justifyContent: "center" }}>
+              {stop ? (
+                <Icon name="check" size={80} color={C.onAccent} />
+              ) : (
+                <T style={{ fontFamily: fonts.black, fontSize: 120, lineHeight: 130, color: C.onAccent, letterSpacing: -4 }}>?</T>
+              )}
+              <View style={{ position: "absolute", top: 12, left: 14 }}>
+                <T style={{ fontFamily: fonts.mono, fontSize: 12, color: "rgba(13,13,14,0.7)" }}>
+                  {String(done + (stop ? 0 : 1)).padStart(2, "0")}
+                </T>
+              </View>
+            </Poster>
+          </View>
+        </Float>
+      </Pop>
     </View>
   );
 }
@@ -889,35 +1130,35 @@ function Steps({ items, tip }: { items: string[]; tip?: string }) {
         backgroundColor: C.surface,
         borderWidth: 1,
         borderColor: C.line2,
-        gap: 10,
+        gap: 12,
       }}
     >
       {items.map((text, i) => (
-        <View key={i} style={{ flexDirection: "row", gap: 10 }}>
+        <View key={i} style={{ flexDirection: "row", gap: 12 }}>
           <View
             style={{
-              width: 20,
-              height: 20,
-              borderRadius: 10,
-              backgroundColor: C.surface2,
+              width: 24,
+              height: 24,
+              borderRadius: 7,
+              backgroundColor: C.accent,
               alignItems: "center",
               justifyContent: "center",
-              marginTop: 1,
+              marginTop: -1,
+              transform: [{ skewX: "-10deg" }],
             }}
           >
-            <T style={{ fontFamily: fonts.mono, fontSize: 11, lineHeight: 14 }}>
+            <T style={{ fontFamily: fonts.black, fontSize: 13, lineHeight: 16, color: C.onAccent }}>
               {i + 1}
             </T>
           </View>
-          <T style={{ flex: 1, fontSize: 14, lineHeight: 19 }}>{text}</T>
+          <T style={{ flex: 1, fontSize: 15, lineHeight: 21 }}>{text}</T>
         </View>
       ))}
       {!!tip && (
-        <T
-          style={{ fontSize: 13, lineHeight: 18, color: C.muted, marginTop: 2 }}
-        >
-          {tip}
-        </T>
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 2, padding: 12, borderRadius: R.chip, backgroundColor: C.bg }}>
+          <Icon name="spark" size={16} color={C.amber} />
+          <T style={{ flex: 1, fontSize: 13, lineHeight: 18, color: C.muted }}>{tip}</T>
+        </View>
       )}
     </View>
   );

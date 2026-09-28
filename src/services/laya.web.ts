@@ -9,3 +9,4 @@ export async function scoreWithLaya(
 export const layaStatus = () => "Browser preview uses local exercise rules";
 
 export async function scoreLoadWithLaya(_options: import("../domain/loadProgression").LoadOptions): Promise<Record<string, number> | null> { return null; }
+export async function scoreRestWithLaya(_options: import("../domain/restDay").RestOptions): Promise<Record<string, number> | null> { return null; }
