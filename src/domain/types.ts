@@ -211,7 +211,10 @@ export interface Performed {
   exerciseId: string;
   sets: SetLog[];
   plannedSets: number;
-  load?: { previous: number; suggested: number; source: 'history' | 'laya' };
+  /** history: last logged weight; laya: a model-approved increase; estimate: a first-time starting weight. */
+  load?: { previous?: number; suggested: number; source: 'history' | 'laya' | 'estimate' };
+  /** Reps suggested for the next set: the planned target or, when Laya chooses it, fewer. */
+  repTarget?: { target: number; suggested: number; source: 'plan' | 'laya' };
 }
 // 1 light, 2 medium, 3 very sore. A muscle listed as sore without a level is very sore,
 // which is how every check-in was treated before levels existed.

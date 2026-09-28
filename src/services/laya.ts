@@ -17,6 +17,8 @@ import {
 } from "../vendor/laya/tokenizer";
 import { LoadOptions } from "../domain/loadProgression";
 import { buildLoadInput } from './loadInput';
+import { RepOptions } from "../domain/repTarget";
+import { buildRepInput } from './repInput';
 import { RestOptions } from "../domain/restDay";
 import { buildRestInput } from './restInput';
 import { modelAssets } from "./modelAssets";
@@ -118,6 +120,11 @@ export async function scoreWithLaya(
 export async function scoreLoadWithLaya(options: LoadOptions) {
   if (options.increase === null) return null;
   return scoreDecision(['hold', 'increase'], ({tok, config}) => buildLoadInput(tok, options,
+    Math.min(Number(config.max_len ?? 512), 512), Number(config.head_max_len ?? 192)));
+}
+export async function scoreRepsWithLaya(options: RepOptions) {
+  if (options.fewer === null) return null;
+  return scoreDecision(['same', 'fewer'], ({tok, config}) => buildRepInput(tok, options,
     Math.min(Number(config.max_len ?? 512), 512), Number(config.head_max_len ?? 192)));
 }
 export async function scoreRestWithLaya(options: RestOptions) {

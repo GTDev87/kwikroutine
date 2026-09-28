@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { initialData } from '../src/domain/types';
 import { newSession, DAY, logSet } from '../src/domain/engine';
 import { exerciseById, exercises } from '../src/data/exercises';
-import { loadOptions, resolveLoad, supportsLoad } from '../src/domain/loadProgression';
+import { defaultLoad, estimateLoad, loadOptions, resolveLoad, supportsLoad } from '../src/domain/loadProgression';
 import { displayWeight, toKg, weightUnit } from '../src/domain/weightUnits';
 import { dataSchema } from '../src/state/schema';
 vi.mock('../src/services/laya', () => ({scoreLoadWithLaya: vi.fn()}));
@@ -47,6 +47,28 @@ describe('load progression',()=>{
     const v=setup();v.history=[v.history[0],v.history[0]];expect(loadOptions(v,v.session!,ex,now)?.increase).toBeNull();
     const small=setup();small.history.forEach(s=>s.completed[0].sets.forEach(set=>set.weight=toKg(10,'lb')));
     expect(loadOptions(small,small.session!,ex,now)?.increase).toBeNull();
+  });
+  it('defaults new exercises to the latest weight anywhere, else a cautious starting estimate',async()=>{
+    const d=setup();d.history=[];
+    const first=defaultLoad(d,d.session!,ex,now)!;
+    expect(first.source).toBe('estimate');expect(first.previous).toBeUndefined();
+    expect(displayWeight(first.suggested,'lb')).toBe('10');
+    expect((await chooseLoad(d,d.session!,ex))?.source).toBe('estimate');
+    const elsewhere=setup();elsewhere.history.forEach(s=>{s.locationId='other';s.endedAt=now-60*DAY;});
+    expect(defaultLoad(elsewhere,elsewhere.session!,ex,now)).toEqual({previous:toKg(50,'lb'),suggested:toKg(50,'lb'),source:'history'});
+    expect(await chooseLoad(elsewhere,elsewhere.session!,ex)).toEqual({previous:toKg(50,'lb'),suggested:toKg(50,'lb'),source:'history'});
+    expect(defaultLoad(d,d.session!,exerciseById['body-squat'],now)).toBeUndefined();
+    const saved=dataSchema.parse(JSON.parse(JSON.stringify({...d,session:{...d.session!,current:{exerciseId:ex.id,plannedSets:2,sets:[],load:first}}})));
+    expect(saved.session!.current!.load).toEqual(first);
+  });
+  it('estimates on the unit step, scaled by experience, never below one step',()=>{
+    for(const e of exercises.filter(supportsLoad)) for(const unit of ['lb','kg'] as const) {
+      const [b,i,a]=(['beginner','intermediate','advanced'] as const).map(l=>Number(displayWeight(estimateLoad(e,l,unit),unit)));
+      expect(b,e.id).toBeGreaterThan(0);expect(b).toBeLessThanOrEqual(i);expect(i).toBeLessThanOrEqual(a);
+      expect(Number.isInteger(b/(unit==='lb'?2.5:1)),`${e.id} ${b}${unit}`).toBe(true);
+    }
+    expect(displayWeight(estimateLoad(exerciseById['goblet-squat'],'beginner','lb'),'lb')).toBe('20');
+    expect(displayWeight(estimateLoad(exercises.find(e=>e.equipment.includes('barbell')&&e.pattern==='squat')!,'beginner','lb'),'lb')).toBe('45');
   });
   it('excludes bodyweight, assistance machines, timed exercises, and conditioning',()=>{
     for(const e of exercises.filter(e=>e.conditioning||e.seconds||e.equipment.some(g=>g==='assisted-dip'||g==='assisted-pullup')))

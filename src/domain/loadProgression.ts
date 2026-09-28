@@ -1,7 +1,7 @@
 import { describeSoreness } from './soreness';
-import { AppData, Equipment, Exercise, Performed, Session } from './types';
+import { AppData, Equipment, Exercise, Level, Performed, Session } from './types';
 import { TrainingMemory, trainingMemory } from './trainingMemory';
-import { fromKg, toKg, weightUnit } from './weightUnits';
+import { WeightUnit, fromKg, toKg, weightUnit } from './weightUnits';
 
 const DAY = 86400000;
 // Only equipment where a larger recorded load means more resistance. Assistance,
@@ -19,6 +19,49 @@ export function supportsLoad(ex: Exercise) {
   return !ex.conditioning && !ex.seconds &&
     !ex.equipment.some(e => e === 'assisted-dip' || e === 'assisted-pullup') &&
     !/\bassisted\b/i.test(ex.name) && ex.equipment.some(e => loadEquipment.has(e));
+}
+/** The smallest sensible change in the user's unit: 2.5 lb / 1 kg for hand weights, 5 lb / 2.5 kg otherwise. */
+export function loadStep(ex: Exercise, unit: WeightUnit) {
+  const handWeights = ex.equipment.some(e => e === 'dumbbells' || e === 'kettlebells');
+  return unit === 'lb' ? (handWeights ? 2.5 : 5) : (handWeights ? 1 : 2.5);
+}
+// Conservative first-visit loads in kg, per hand for dumbbells and kettlebells and the total
+// for bars. "small" is isolation work for arms, shoulders, calves and grip.
+const startingKg: Record<string, { small: number; medium: number; large: number }> = {
+  barbell: { small: 20, medium: 20, large: 20 }, // an empty Olympic bar
+  'trap-bar': { small: 25, medium: 25, large: 25 },
+  'ez-bar': { small: 10, medium: 10, large: 10 },
+  'smith-machine': { small: 10, medium: 10, large: 20 },
+  dumbbells: { small: 4, medium: 7, large: 9 },
+  kettlebells: { small: 6, medium: 8, large: 12 },
+  landmine: { small: 5, medium: 10, large: 10 },
+  plates: { small: 5, medium: 5, large: 10 },
+  'leg-press': { small: 40, medium: 40, large: 40 },
+  machine: { small: 10, medium: 20, large: 25 },
+};
+const levelScale = { beginner: 1, intermediate: 1.5, advanced: 2 };
+const isolation = /curl|raise|fly|kickback|extension|pushdown|press-?down|wrist|rotation|face-pull|side-bend|halo|shrug|calf|crunch|pullover|reverse-fly|upright/;
+/** A cautious starting weight for an exercise with no recorded load. A product default, not a strength estimate. */
+export function estimateLoad(ex: Exercise, level: Level, unit: WeightUnit) {
+  const kind = ['barbell', 'trap-bar', 'ez-bar', 'smith-machine', 'dumbbells', 'kettlebells', 'landmine', 'plates', 'leg-press']
+    .find(e => ex.equipment.includes(e as Equipment)) ?? 'machine';
+  const size = ex.pattern === 'squat' || ex.pattern === 'hinge' ? 'large'
+    : ex.pattern === 'accessory' || isolation.test(ex.id) ? 'small' : 'medium';
+  // Experience scales compound lifts more than isolation work.
+  const scale = size === 'small' ? 1 + (levelScale[level] - 1) / 2 : levelScale[level];
+  const step = loadStep(ex, unit);
+  return toKg(Math.max(step, Math.round(fromKg(startingKg[kind][size] * scale, unit) / step) * step), unit);
+}
+/** A default for the weight field when progression has nothing to offer: the most recent
+ * weight logged for this exercise anywhere, otherwise a cautious starting estimate. */
+export function defaultLoad(data: AppData, session: Session, ex: Exercise, now = Date.now()): NonNullable<Performed['load']> | undefined {
+  if (!supportsLoad(ex)) return undefined;
+  const last = data.history.filter(s => s.id !== session.id && s.startedAt <= now)
+    .flatMap(s => s.completed.filter(p => p.exerciseId === ex.id).flatMap(p => p.sets))
+    .filter(set => set.at <= now && Number.isFinite(set.weight) && set.weight > 0 && set.weight <= 1000)
+    .sort((a, b) => b.at - a.at)[0];
+  if (last) return { previous: last.weight, suggested: last.weight, source: 'history' };
+  return { suggested: estimateLoad(ex, data.profile?.level ?? 'beginner', weightUnit(data.profile)), source: 'estimate' };
 }
 export interface LoadOptions {
   previous: number;
@@ -41,8 +84,7 @@ export function loadOptions(data: AppData, session: Session, ex: Exercise, now =
   const previous = last.weight;
   if (!Number.isFinite(previous) || previous <= 0 || previous > 1000 || last.at > now) return null;
   const unit = weightUnit(data.profile);
-  const handWeights = ex.equipment.some(e => e === 'dumbbells' || e === 'kettlebells');
-  const step = unit === 'lb' ? (handWeights ? 2.5 : 5) : (handWeights ? 1 : 2.5);
+  const step = loadStep(ex, unit);
   const next = toKg((Math.floor((fromKg(previous, unit) + .001) / step) + 1) * step, unit);
   const increment = next - previous;
   const m = memory ?? trainingMemory(data, session, now);

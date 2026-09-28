@@ -41,6 +41,7 @@ import { useStore } from "../state/store";
 import { exerciseById } from "../data/exercises";
 import {
   applyFeedback,
+  applyRepTarget,
   acceptSelection,
   estimateSeconds,
   finishSession,
@@ -48,6 +49,8 @@ import {
   remainingSeconds,
 } from "../domain/engine";
 import { chooseNext } from "../services/selection";
+import { chooseReps } from "../services/repSelection";
+import { loadStep } from "../domain/loadProgression";
 import {
   Equipment,
   Exercise,
@@ -192,6 +195,12 @@ export function Workout({ go }: { go: (route: string) => void }) {
       x.setValue(0);
     }
   }, [ex, x]);
+  // Each set starts from the suggested reps: the plan, or fewer when Laya recommends it.
+  const setsDone = session?.current?.sets.length ?? 0,
+    suggestedReps = session?.current?.repTarget?.suggested;
+  useEffect(() => {
+    if (ex && !ex.seconds) setReps(String(suggestedReps ?? ex.reps));
+  }, [ex, setsDone, suggestedReps]);
   const pan = useMemo(
     () =>
       PanResponder.create({
@@ -282,14 +291,14 @@ export function Workout({ go }: { go: (route: string) => void }) {
     const parsedReps = held ?? Number(reps),
       parsedWeight = toKg(Number(weight), unit);
     if (!valid) return;
-    update((d) =>
-      logSet(d, {
-        reps: parsedReps,
-        weight: parsedWeight,
-        effort,
-        at: Date.now(),
-      }),
-    );
+    const set = { reps: parsedReps, weight: parsedWeight, effort, at: Date.now() };
+    update((d) => logSet(d, set));
+    // Ask for the next set's reps during the rest, from the state that includes this set.
+    const after = logSet(data, set), cur = after.session?.current;
+    if (ex && cur?.exerciseId === ex.id)
+      void chooseReps(after, after.session!, ex, cur)
+        .then((target) => update((d) => applyRepTarget(d, ex.id, cur.sets.length, target)))
+        .catch(() => {});
     setHeld(null);
     setEffort("right");
     void Haptics.notificationAsync(
@@ -628,6 +637,14 @@ export function Workout({ go }: { go: (route: string) => void }) {
     const cur = session.current;
     const weighted = !ex.conditioning && ex.equipment.some((e) => !["mat", "chair", "bench", "adjustable-bench", "decline-bench", "bands", "loop-bands", "pullup-bar", "suspension", "rings", "stability-ball", "ab-wheel", "dip-station", "captains-chair", "roman-chair", "plyo-box"].includes(e));
     const lastSet = cur.sets.length + 1 >= cur.plannedSets;
+    const step = loadStep(ex, unit);
+    // Snap to the unit's step, then move one step; never below zero.
+    const stepWeight = (dir: 1 | -1) => {
+      const n = Number(weight) || 0, snapped = Math.round(n / step) * step;
+      const next = snapped !== n && Math.sign(snapped - n) === dir ? snapped : snapped + dir * step;
+      return String(Math.max(0, Math.round(next * 100) / 100));
+    };
+    const implement = ex.equipment.includes("dumbbells") ? " per dumbbell" : ex.equipment.includes("kettlebells") ? " per kettlebell" : "";
     return (
       <View style={{ flex: 1 }}>
         <Header
@@ -771,27 +788,45 @@ export function Workout({ go }: { go: (route: string) => void }) {
               />
             </View>
           )}
+          {!ex.seconds && rest === 0 && cur.repTarget && cur.repTarget.suggested < cur.repTarget.target && (
+            <T style={{ paddingHorizontal: 24, paddingTop: 8, color: C.muted, fontSize: 13, lineHeight: 19, textAlign: "center" }}>
+              {`Laya suggests ${cur.repTarget.suggested} reps this set (plan: ${cur.repTarget.target}). Stop there even if you could do more.`}
+            </T>
+          )}
           {weighted && rest === 0 && (
-            <View style={{ paddingHorizontal: 24, paddingTop: 6, gap: 8 }}>
-            <View style={s.row}>
+            <View style={{ paddingHorizontal: 24, paddingTop: 10, gap: 8 }}>
+            <View style={[s.row, { gap: 10 }]}>
               <T style={{ color: C.muted, fontSize: 14 }}>Load</T>
+              <Nudge
+                label="Less weight"
+                sign="−"
+                onPress={() => setWeight(stepWeight(-1))}
+              />
               <TextInput
                 accessibilityLabel={`Weight in ${unit === "lb" ? "pounds" : "kilograms"}`}
                 keyboardType="decimal-pad"
                 value={weight}
                 onChangeText={setWeight}
                 maxLength={7}
+                selectTextOnFocus
                 selectionColor={C.accent}
                 style={[
                   s.input,
                   {
-                    minHeight: 40,
+                    minHeight: 46,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                    width: 84,
-                    fontSize: 16,
+                    width: 92,
+                    fontSize: 20,
+                    fontFamily: fonts.bold,
+                    textAlign: "center",
                   },
                 ]}
+              />
+              <Nudge
+                label="More weight"
+                sign="+"
+                onPress={() => setWeight(stepWeight(1))}
               />
               <T style={{ color: C.muted, fontSize: 14 }}>{unit}</T>
             </View>
@@ -799,13 +834,15 @@ export function Workout({ go }: { go: (route: string) => void }) {
               <View style={{gap: 4}}>
                 <T style={{color: C.muted, fontSize: 13, lineHeight: 19}}>
                   {cur.load.source === 'laya'
-                    ? `Suggested: ${displayWeight(cur.load.suggested, unit)} ${unit} · last time ${displayWeight(cur.load.previous, unit)} ${unit}. Two easy workouts support a small increase.`
-                    : `Last time here: ${displayWeight(cur.load.previous, unit)} ${unit}. Adjust to what feels right today.`}
+                    ? `Suggested: ${displayWeight(cur.load.suggested, unit)} ${unit} · last time ${displayWeight(cur.load.previous ?? cur.load.suggested, unit)} ${unit}. Two easy workouts support a small increase.`
+                    : cur.load.source === 'estimate'
+                      ? `Starting suggestion: ${displayWeight(cur.load.suggested, unit)} ${unit}${implement}. Change it to a weight you can lift for ${ex.reps} controlled reps.`
+                      : `Last time: ${displayWeight(cur.load.previous ?? cur.load.suggested, unit)} ${unit}. Adjust to what feels right today.`}
                 </T>
-                {cur.load.source === 'laya' && <>
+                {cur.load.source === 'laya' && cur.load.previous !== undefined && <>
                   <T style={{color: C.muted, fontSize: 13}}>If that weight isn’t available, keep your previous weight.</T>
                   <TextLink title="Use last weight" style={{ alignSelf: "flex-start", paddingVertical: 8 }}
-                    onPress={() => setWeight(displayWeight(cur.load!.previous, unit))} />
+                    onPress={() => setWeight(displayWeight(cur.load!.previous!, unit))} />
                 </>}
               </View>
             )}

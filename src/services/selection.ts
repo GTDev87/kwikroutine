@@ -8,6 +8,7 @@ import {
 } from "../domain/engine";
 import { scoreWithLaya } from "./laya";
 import { chooseLoad } from './weightSelection';
+import { chooseReps } from './repSelection';
 import { trainingMemory } from '../domain/trainingMemory';
 export async function chooseNext(data: AppData, session: Session) {
   const candidates = eligible(data, session);
@@ -37,13 +38,16 @@ export async function chooseNext(data: AppData, session: Session) {
     ),
   );
   const load = ex ? await chooseLoad(data, session, ex) : undefined;
+  const plannedSets = ex ? prescription(ex, data).sets : 0;
+  const repTarget = ex ? await chooseReps(data, session, ex, { exerciseId: ex.id, sets: [], plannedSets, load }) : undefined;
   return {
     current: ex
       ? {
           exerciseId: ex.id,
           sets: [],
-          plannedSets: prescription(ex, data).sets,
+          plannedSets,
           load,
+          repTarget,
         }
       : null,
     engine: modelWeights ? ("laya" as const) : ("rules" as const),

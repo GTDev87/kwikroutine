@@ -8,6 +8,7 @@ import {
   Focus,
   Level,
   Muscle,
+  Performed,
   Rejection,
   Session,
   SetLog,
@@ -255,6 +256,12 @@ export function logSet(data: AppData, set: SetLog): AppData {
       restUntil: done ? null : set.at + ex.rest * 1000,
     },
   };
+}
+/** Store a rep suggestion made after a set, if the user is still on that exercise and set. */
+export function applyRepTarget(data: AppData, exerciseId: string, setsDone: number, repTarget: Performed['repTarget']): AppData {
+  const current = data.session?.current;
+  if (!repTarget || current?.exerciseId !== exerciseId || current.sets.length !== setsDone) return data;
+  return { ...data, session: { ...data.session!, current: { ...current, repTarget } } };
 }
 export function finishSession(data: AppData, now = Date.now()): AppData {
   if (!data.session) return data;

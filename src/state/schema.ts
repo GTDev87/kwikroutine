@@ -15,7 +15,8 @@ const schedule = z.object({ mon: dayPlan, tue: dayPlan, wed: dayPlan, thu: dayPl
 const performed = z.object({
   exerciseId: z.string(),
   plannedSets: z.number().int().min(1).max(5),
-  load: z.object({ previous: z.number().positive().max(1000), suggested: z.number().positive().max(1000), source: z.enum(['history', 'laya']) }).optional(),
+  load: z.object({ previous: z.number().positive().max(1000).optional(), suggested: z.number().positive().max(1000), source: z.enum(['history', 'laya', 'estimate']) }).optional(),
+  repTarget: z.object({ target: z.number().int().min(1).max(300), suggested: z.number().int().min(1).max(300), source: z.enum(['plan', 'laya']) }).optional(),
   sets: z.array(
     z.object({
       reps: z.number().nonnegative(),
