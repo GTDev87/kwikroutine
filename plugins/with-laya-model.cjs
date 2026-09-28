@@ -3,6 +3,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const files = ['encoder.onnx', 'head.onnx', 'tokenizer.layajson', 'config.layajson'];
 module.exports = config => {
+  // Without the weights the app still builds, but silently falls back to rule-based picks.
+  const missing = files.filter(name => !fs.existsSync(path.join(__dirname, '..', 'assets/models', name)));
+  if (missing.length)
+    console.warn(`\n⚠️  Laya model files missing: ${missing.join(', ')}.\n   This build will use rule-based exercise picks only. Run \`npm run model:fetch\` first.\n`);
   const assetPack = process.env.EAS_BUILD_PROFILE === 'production' || process.env.KWIK_ANDROID_ASSET_PACK === '1';
   config = withXcodeProject(config, c => {
     const project = c.modResults;

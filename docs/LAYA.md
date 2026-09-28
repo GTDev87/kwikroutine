@@ -4,15 +4,18 @@ The app uses the English `convaiinnovations/laya` checkpoint at revision `55cf4c
 
 ## Get the model on a fresh clone
 
-The two ONNX weight files (`encoder.onnx` 793 MB, `head.onnx` 53 MB) are too large for git. They are attached to a GitHub Release of this private repo, tagged `laya-<first 12 hex of the encoder SHA-256>` (currently `laya-cf7017408dba`). Everything else, including `manifest.json` with every file's SHA-256 and the small tokenizer/config files, is committed.
+The two ONNX weight files (`encoder.onnx` 793 MB, `head.onnx` 53 MB) are too large for normal git files. They are stored on GitHub as 16 MB pieces under hidden refs, `refs/model/laya-<first 12 hex of the encoder SHA-256>/…` (currently `laya-cf7017408dba`). Ordinary clones and pulls never download them. `manifest.json` (with every file's SHA-256) and the small tokenizer/config files are committed normally.
 
 ```sh
-brew install gh && gh auth login   # or export GITHUB_TOKEN with read access to the repo
-npm run model:fetch                # downloads missing weights and verifies them against manifest.json
+git clone ssh://git@ssh.github.com:443/GTDev87/kwikroutine.git   # or git@github.com:GTDev87/kwikroutine.git
+cd kwikroutine && npm install
+npm run model:fetch    # downloads the pieces over your normal git access, reassembles, verifies
 npm run model:check
 ```
 
-After re-converting the model (below), publish the new weights once with `npm run model:publish`. The tag follows the encoder hash, so each model version gets its own release.
+`model:fetch` uses the same remote and credentials as `git pull`, retries each piece if a transfer stalls, checks every piece and the final files against recorded hashes, and then drops the local piece refs so git can reclaim the space. Running it again when the files are already correct does nothing. A native build without the weights still succeeds but prints a warning and uses rule-based picks only; production EAS builds refuse to build without them.
+
+After re-converting the model (below), upload the new weights once with `npm run model:publish`. The ref name follows the encoder hash, so each model version is stored separately, and re-publishing an unchanged model uploads nothing.
 
 ## Rebuild the model from upstream
 

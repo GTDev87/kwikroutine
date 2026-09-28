@@ -12,13 +12,13 @@ A React Native / Expo SDK 55 fitness app for building an interesting, achievable
 
 ```sh
 npm install
-npm run model:fetch   # Laya weights from the GitHub Release; see docs/LAYA.md
+npm run model:fetch   # Laya weights (stored in hidden git refs); see docs/LAYA.md
 npm run preview       # interactive browser preview at http://localhost:8081
 npm run ios           # native development build (Xcode 26.2+ required)
 npm run android       # native development build (Android SDK required)
 ```
 
-The Laya weights are too large for Git and live on a GitHub Release; `npm run model:fetch` downloads and verifies them (see [docs/LAYA.md](docs/LAYA.md)). The preview APK is not in Git either; `artifacts/android-preview.json` records its hash and build notes. The custom config plugin embeds the weights into the native app. **Expo Go cannot run the ONNX or RevenueCat native integrations.**
+The Laya weights are too large for normal Git files, so they are stored on GitHub as pieces under hidden refs; `npm run model:fetch` downloads, reassembles and verifies them (see [docs/LAYA.md](docs/LAYA.md)). The preview APK is not in Git either; `artifacts/android-preview.json` records its hash and build notes. The custom config plugin embeds the weights into the native app. **Expo Go cannot run the ONNX or RevenueCat native integrations.**
 
 For a self-contained iOS simulator build, with no Metro connection needed at runtime:
 
